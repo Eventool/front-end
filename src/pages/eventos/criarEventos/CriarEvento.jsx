@@ -18,7 +18,7 @@ import { useAlerta } from "../../../context/AlertaContext";
 
 const CriarEvento = ({ setTitulo, setActions }) => {
   const navigate = useNavigate();
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const [step, setStep] = useState(0);
   const labels = ["Evento", "Endereço", "Finalizar"];
@@ -50,14 +50,14 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       const { status } = await postEvento(request, formData);
 
       if (status !== 201) {
-        showAlerta("Não foi possível criar evento", "error");
+        alerta.error("Não foi possível criar evento");
         return;
       }
 
-      showAlerta("Evento criado com sucesso");
+      alerta.success("Evento criado com sucesso");
       navigate(-1);
     } catch (err) {
-      showAlerta("Não foi possível criar evento", "error");
+      alerta.error("Não foi possível criar evento");
       console.log("Erro ao criar evento: " + err);
     } finally {
       setLoading(false);
@@ -139,7 +139,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       setFormularios(data);
     } catch (err) {
       console.log("Erro ao buscar formulários: " + err);
-      showAlerta("Erro ao buscar formulários", "error");
+      alerta.error("Erro ao buscar formulários");
     }
   };
 
@@ -157,7 +157,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
         );
       } catch (err) {
         console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        alerta.error("Erro ao buscar evento");
       }
     };
     buscarFormularios();

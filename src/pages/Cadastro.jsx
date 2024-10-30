@@ -28,7 +28,7 @@ const Cadastro = ({ setTitulo, setActions }) => {
   const { login } = useUser();
   const navigate = useNavigate();
 
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   useEffect(() => {
     setTitulo("");
@@ -64,14 +64,14 @@ const Cadastro = ({ setTitulo, setActions }) => {
         const response = await cadastrar(dados);
 
         if (response.error) {
-          showAlerta("Não foi possivel realizar o cadastro", "error");
+          alerta.error("Não foi possivel realizar o cadastro");
           return;
         }
 
-        showAlerta("Cadastro realizado com sucesso");
+        alerta.success("Cadastro realizado com sucesso");
         navigate("/login");
       } catch (err) {
-        showAlerta("Não foi possivel realizar o cadastro", "error");
+        alerta.error("Não foi possivel realizar o cadastro");
         console.log(err);
       } finally {
         setLoading(false);

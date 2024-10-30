@@ -54,7 +54,7 @@ const Registro = ({
 
   const { eventId } = useParams();
   const navigate = useNavigate();
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const [evento, setEvento] = useState(null);
   const [eventoEditado, setEventoEditado] = useState(null);
@@ -167,13 +167,13 @@ const Registro = ({
     const response = await putEvento(eventoEditado, evento.id);
 
     if (!response) {
-      showAlerta("Erro ao atualizar evento", "error");
+      alerta.error("Erro ao atualizar evento");
       return;
     }
 
     setEvento({ ...response });
     setEditando(false);
-    showAlerta(`Evento ${response.nome} atualizado com sucesso`);
+    alerta.success(`Evento ${response.nome} atualizado com sucesso`);
   };
 
   const handleCancelar = () => {
@@ -205,7 +205,7 @@ const Registro = ({
         }, 1000);
       } catch (err) {
         console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        alerta.error("Erro ao buscar evento");
       }
     };
 
@@ -226,11 +226,11 @@ const Registro = ({
       const { status } = await deleteEvento(evento.id);
 
       if (status !== 204) {
-        showAlerta("Erro ao excluir evento", "error");
+        alerta.error("Erro ao excluir evento", "error");
         return;
       }
 
-      showAlerta("Evento excluido com sucesso");
+      alerta.success("Evento excluido com sucesso");
 
       navigate("/eventos");
     });

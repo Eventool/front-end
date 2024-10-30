@@ -14,7 +14,7 @@ import { useAlerta } from "../../../context/AlertaContext";
 
 const CriarDemandas = ({ setTitulo, setActions }) => {
   const navigate = useNavigate();
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -44,11 +44,11 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
 
     if (response.error) {
       console.error(response.data);
-      showAlerta("Não foi possível criar demanda.", "error");
+      alerta.error("Não foi possível criar demanda.");
       return;
     }
 
-    showAlerta(`Demanda ${response.nome} criada com sucesso`);
+    alerta.success(`Demanda ${response.nome} criada com sucesso`);
     navigate(-1);
   };
 
@@ -109,7 +109,7 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
         setEventos(data);
       } catch (err) {
         console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        alerta.error("Erro ao buscar evento");
       }
     };
 
@@ -128,12 +128,12 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
         );
       } catch (err) {
         console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        alerta.success("Erro ao buscar evento");
       }
     };
 
     buscarResponsaveis();
-  }, [showAlerta]);
+  }, []);
 
   useEffect(() => {
     if (!eventId) return;

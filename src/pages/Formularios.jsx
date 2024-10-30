@@ -27,7 +27,7 @@ import { useAlerta } from "../context/AlertaContext";
 
 const Formularios = ({ setTitulo, setActions }) => {
   const theme = useTheme();
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   useEffect(() => {
     setTitulo("Formulários");
@@ -61,7 +61,7 @@ const Formularios = ({ setTitulo, setActions }) => {
       setFormularios(data);
     } catch (err) {
       console.log("Erro ao buscar formulários: " + err);
-      showAlerta("Erro ao buscar formulários", "error");
+      alerta.error("Erro ao buscar formulários");
     }
   };
 
@@ -150,7 +150,7 @@ const Formularios = ({ setTitulo, setActions }) => {
 };
 
 const CardFormulario = ({ formulario, theme, openEditarDialog }) => {
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const handleCopyClick = (formulario) => {
     navigator.clipboard.writeText(formulario.url);

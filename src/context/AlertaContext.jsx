@@ -3,6 +3,7 @@ import Alerta from "../components/alerta/Alerta";
 import CheckIcon from "@mui/icons-material/Check";
 import BlockIcon from "@mui/icons-material/Block";
 
+// Create the context
 const AlertaContext = createContext();
 
 export function AlertaProvider({ children }) {
@@ -11,28 +12,29 @@ export function AlertaProvider({ children }) {
   const [alertaSeverity, setAlertaSeverity] = useState("");
   const [alertaIcon, setAlertaIcon] = useState(null);
 
-  const showAlerta = useCallback(
-    (label, severity = "success") => {
-      let icon;
-      switch (severity) {
-        case "success":
-          icon = <CheckIcon />;
-          break;
-        case "error":
-          icon = <BlockIcon />;
-          break;
-      }
+  const showAlerta = useCallback((label, severity, icon) => {
+    setAlertaLabel(label);
+    setAlertaIcon(icon);
+    setAlertaSeverity(severity);
+    setAlertaOpen(true);
+  }, []);
 
-      setAlertaLabel(label);
-      setAlertaIcon(icon);
-      setAlertaSeverity(severity);
-      setAlertaOpen(true);
+  const success = useCallback(
+    (label) => {
+      showAlerta(label, "success", <CheckIcon />);
     },
-    [setAlertaLabel, setAlertaIcon, setAlertaSeverity, setAlertaOpen]
+    [showAlerta]
+  );
+
+  const error = useCallback(
+    (label) => {
+      showAlerta(label, "error", <BlockIcon />);
+    },
+    [showAlerta]
   );
 
   return (
-    <AlertaContext.Provider value={{ showAlerta }}>
+    <AlertaContext.Provider value={{ success, error }}>
       <Alerta
         setAlertaOpen={setAlertaOpen}
         severity={alertaSeverity}

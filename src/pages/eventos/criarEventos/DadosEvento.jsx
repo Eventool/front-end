@@ -25,7 +25,7 @@ const DadosEvento = ({
     setDadosEvento({ ...dadosEvento, [name]: e.format("YYYY-MM-DDTHH:mm:ss") });
   };
 
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -33,12 +33,12 @@ const DadosEvento = ({
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      showAlerta(`Arquivo ${file.name} não permitido`, "error");
+      alerta.error(`Arquivo ${file.name} não permitido`, "error");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      showAlerta(`Arquivo muito grande. Tamanho máximo: 5MB`, "error");
+      alerta.error(`Arquivo muito grande. Tamanho máximo: 5MB`, "error");
       return;
     }
 
