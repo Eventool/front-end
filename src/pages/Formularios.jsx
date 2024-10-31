@@ -154,7 +154,7 @@ const CardFormulario = ({ formulario, theme, openEditarDialog }) => {
 
   const handleCopyClick = (formulario) => {
     navigator.clipboard.writeText(formulario.url);
-    showAlerta(
+    alerta.success(
       `Link para formulário ${formulario.nome} copiado para área de transferência`
     );
   };

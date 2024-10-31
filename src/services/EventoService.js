@@ -1,5 +1,5 @@
 import axios from "axios";
-import { urlData } from "./DataService";
+import { postData, urlData } from "./DataService";
 
 export const buscarEventos = async () => {
   try {
@@ -17,22 +17,14 @@ export const buscarEventos = async () => {
   }
 };
 
-// TODO: Otimizar a criação do evento em um único post
 export const postEvento = async (request, imgRequest) => {
   request.orcamento = request.orcamento.replaceAll(".", "").replace(",", ".");
-  try {
-    const response = await axios.post(urlData + "eventos", request, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
-      },
-    });
 
-    await patchImgEvento(imgRequest, response.data.id);
-
-    return response;
-  } catch (err) {
-    console.log(err.response.status);
-  }
+  const formData = new FormData();
+  formData.append('data', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+  formData.append('file', imgRequest);
+  
+  return await postData('eventos', formData);
 };
 
 export const patchImgEvento = async (request, id) => {

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useCallback } from "react";
 import Alerta from "../components/alerta/Alerta";
 import CheckIcon from "@mui/icons-material/Check";
 import BlockIcon from "@mui/icons-material/Block";
+import InfoIcon from "@mui/icons-material/Info";
+import WarningIcon from "@mui/icons-material/Warning";
 
 // Create the context
 const AlertaContext = createContext();
@@ -33,8 +35,22 @@ export function AlertaProvider({ children }) {
     [showAlerta]
   );
 
+  const info = useCallback(
+    (label) => {
+      showAlerta(label, "info", <InfoIcon />);
+    },
+    [showAlerta]
+  );
+
+  const warning = useCallback(
+    (label) => {
+      showAlerta(label, "warning", <WarningIcon />);
+    },
+    [showAlerta]
+  );
+
   return (
-    <AlertaContext.Provider value={{ success, error }}>
+    <AlertaContext.Provider value={{ success, error, info, warning }}>
       <Alerta
         setAlertaOpen={setAlertaOpen}
         severity={alertaSeverity}

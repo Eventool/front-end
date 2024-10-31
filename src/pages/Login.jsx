@@ -16,21 +16,17 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import imagemFundo from "../assets/Login.png";
 import { Password } from "@mui/icons-material";
-import { useAlerta } from "../context/AlertaContext";
 
 const Login = ({ setTitulo, setActions }) => {
   const { login } = useUser();
   const [dados, setDados] = useState({ email: "", senha: "" });
   const navigate = useNavigate();
-  const alerta = useAlerta();
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setTitulo("");
     setActions(null);
-
-    alerta.error("Teste");
   }, [setTitulo, setActions]);
 
   const handleChange = (e) => {

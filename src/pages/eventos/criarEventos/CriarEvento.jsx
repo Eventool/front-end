@@ -17,6 +17,11 @@ import { fetchData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
 
 const CriarEvento = ({ setTitulo, setActions }) => {
+  useEffect(() => {
+    setTitulo("");
+    setActions(null);
+  });
+
   const navigate = useNavigate();
   const alerta = useAlerta();
 
@@ -43,22 +48,20 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       idResponsavel: dadosEvento.responsavel?.id,
     };
 
-    const formData = new FormData();
-    formData.append("img", imagem);
-
     try {
-      const { status } = await postEvento(request, formData);
+      const response = await postEvento(request, imagem);
+      console.log(response);
 
-      if (status !== 201) {
-        alerta.error("Não foi possível criar evento");
-        return;
-      }
+      // if (status !== 201) {
+      //   alerta.error("Não foi possível criar evento");
+      //   return;
+      // }
 
-      alerta.success("Evento criado com sucesso");
-      navigate(-1);
+      // alerta.success("Evento criado com sucesso");
+      // navigate(-1);
     } catch (err) {
       alerta.error("Não foi possível criar evento");
-      console.log("Erro ao criar evento: " + err);
+      console.error("Erro ao criar evento: " + err);
     } finally {
       setLoading(false);
     }
@@ -91,8 +94,6 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       cidade: "",
     },
   });
-
-  //https://app.serenity.com.br/
 
   const [imagem, setImagem] = useState(null);
 
@@ -138,7 +139,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       const data = await fetchData(`forms`);
       setFormularios(data);
     } catch (err) {
-      console.log("Erro ao buscar formulários: " + err);
+      console.error("Erro ao buscar formulários: " + err);
       alerta.error("Erro ao buscar formulários");
     }
   };
@@ -149,7 +150,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
     const buscarResponsaveis = async () => {
       try {
         const data = await fetchData(`usuarios`);
-        console.log(data);
+
         setResponsaveis(
           data
             .filter((user) => user.contato !== null)
@@ -193,11 +194,6 @@ const CriarEvento = ({ setTitulo, setActions }) => {
   const handleDadosChange = (e, name) => {
     setDadosEvento({ ...dadosEvento, [name]: e.target.value });
   };
-
-  useEffect(() => {
-    setTitulo("");
-    setActions(null);
-  });
 
   return (
     <>
