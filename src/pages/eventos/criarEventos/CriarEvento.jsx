@@ -52,13 +52,13 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       const response = await postEvento(request, imagem);
       console.log(response);
 
-      // if (status !== 201) {
-      //   alerta.error("Não foi possível criar evento");
-      //   return;
-      // }
+      if (response.error) {
+        alerta.error("Não foi possível criar evento");
+        return;
+      }
 
-      // alerta.success("Evento criado com sucesso");
-      // navigate(-1);
+      alerta.success("Evento criado com sucesso");
+      navigate(-1);
     } catch (err) {
       alerta.error("Não foi possível criar evento");
       console.error("Erro ao criar evento: " + err);

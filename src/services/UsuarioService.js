@@ -1,5 +1,6 @@
 import axios from "axios";
 import { urlData } from "./DataService";
+import Cookies from 'js-cookie';
 
 export const logar = async (dados) => {
   try {
@@ -11,6 +12,10 @@ export const logar = async (dados) => {
     if (response.status !== 200) return;
 
     const { token, id, tipoUsuario, contato } = response.data;
+    
+    Cookies.set('token', token);
+
+    console.log(Cookies.get('token'));
 
     sessionStorage.setItem("TOKEN", token);
     sessionStorage.setItem("ID", id);

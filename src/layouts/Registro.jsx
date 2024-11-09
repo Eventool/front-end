@@ -198,6 +198,7 @@ const Registro = ({
     const buscarEvento = async () => {
       try {
         const data = await fetchData(`eventos/${eventId}`);
+        console.log(data);
         setEvento(data);
         setEventoEditado(data);
         setTimeout(() => {
@@ -320,7 +321,7 @@ const Registro = ({
                   <Typography variant="subtitle1">Orçamento</Typography>
                   <Typography variant="h6">
                     <small>R$</small>{" "}
-                    {aplicarMascara(evento.orcamento.toString(), "dinheiro")}
+                    {aplicarMascara(evento.orcamento.toFixed(2), "dinheiro")}
                   </Typography>
                 </Box>
 
@@ -396,7 +397,7 @@ const Registro = ({
                     label="Orçamento"
                     startAdornment={"R$"}
                     value={`${aplicarMascara(
-                      eventoEditado.orcamento + "",
+                      eventoEditado.orcamento.toFixed(2),
                       "dinheiro"
                     )}`}
                   />
