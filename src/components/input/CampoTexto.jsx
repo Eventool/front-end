@@ -1,6 +1,6 @@
 import { InputAdornment, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { aplicarMascara } from "../../utils/formatarUtil";
 
 const CampoTexto = ({
@@ -13,33 +13,71 @@ const CampoTexto = ({
   regex,
   mascara,
   placeholder,
-  errorMsg = "",
+  defaultMessage = "Campo inválido",
   style,
   required,
   onKeyUp = () => {},
   type = "text",
+  textSize = { min: 3, max: 48 },
   margin = "normal",
+  defaultValue,
   startAdornment = null,
+  inputRef,
+  handleErros = () => {},
 }) => {
   const [possuiErro, setErro] = useState(false);
+  const [msgErro, setMsgErro] = useState(defaultMessage);
+
+  useEffect(() => {
+    handleErros({ name: name, value: possuiErro });
+  }, [possuiErro, name]);
 
   const handleOnChange = (e) => {
-    let valorAtual = e.target.value;
+    let valorAtual = e.target.value.slice(0, textSize.max);
 
     if (mascara) valorAtual = aplicarMascara(valorAtual, mascara);
-    if (regex)
-      setErro(
-        (required || e.target.value.length !== 0) && !regex.test(valorAtual)
-      );
+
+    validate(valorAtual);
 
     e.target.value = valorAtual;
 
     handleChange(e, name);
   };
 
+  const validate = (valorAtual) => {
+    setErro(() => {
+      return regex && !regex.test(valorAtual);
+    });
+
+    setErro(() => {
+      if (regex && !regex.test(valorAtual)) {
+        setMsgErro(defaultMessage);
+
+        return true;
+      } else if (
+        valorAtual.length !== 0 &&
+        (valorAtual.length < textSize.min || valorAtual.length > textSize.max)
+      ) {
+        setMsgErro(
+          `O campo deve possuir entre ${textSize.min} e ${textSize.max} caracteres.`
+        );
+
+        return true;
+      } else if (required && valorAtual.length === 0) {
+        setMsgErro(`O campo é obrigatório.`);
+
+        return true;
+      } else {
+        return false;
+      }
+    });
+  };
+
   return (
     <Grid size={size}>
       <TextField
+        inputRef={inputRef}
+        onFocus={(e) => validate(e.target.value)}
         type={type}
         sx={sx}
         placeholder={placeholder}
@@ -50,10 +88,11 @@ const CampoTexto = ({
         value={value}
         onChange={handleOnChange}
         error={possuiErro}
-        helperText={possuiErro ? errorMsg : ""}
+        helperText={possuiErro ? msgErro : ""}
         required={required}
         onKeyUp={onKeyUp}
         variant="outlined"
+        defaultValue={defaultValue}
         slotProps={{
           input: {
             startAdornment: startAdornment ? (

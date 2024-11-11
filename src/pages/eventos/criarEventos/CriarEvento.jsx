@@ -9,10 +9,7 @@ import DadosEvento from "./DadosEvento";
 import EventoEndereco from "./EventoEndereco";
 import AbrirInscricoes from "./AbrirInscricoes";
 import Finalizar from "./Finalizar";
-import { getFormularios } from "../../../utils/dataMockUtil";
 import { postEvento } from "../../../services/EventoService";
-import BlockIcon from "@mui/icons-material/Block";
-import axios from "axios";
 import { fetchData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
 
@@ -50,7 +47,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
 
     try {
       const response = await postEvento(request, imagem);
-      console.log(response);
+      [];
 
       if (response.error) {
         alerta.error("Não foi possível criar evento");
@@ -75,7 +72,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
 
   const [dadosEvento, setDadosEvento] = useState({
     nome: "",
-    orcamento: "",
+    orcamento: "0,00",
     inicio: "",
     fim: "",
     responsavel: {
@@ -94,6 +91,30 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       cidade: "",
     },
   });
+
+  const [erros, setErros] = useState([]);
+  const [podeAvancar, setAvancar] = useState(false);
+
+  const handleErros = (e) => {
+    setErros((prevState) => ({
+      ...prevState,
+      [e.name]: e.value,
+    }));
+  };
+
+  useEffect(() => {
+    console.log(erros);
+    setAvancar(() => {
+      const campos = Object.keys(erros);
+      for (let i = 0; i < campos.length; i++) {
+        if (erros[campos[i]]) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }, [erros]);
 
   const [imagem, setImagem] = useState(null);
 
@@ -134,36 +155,38 @@ const CriarEvento = ({ setTitulo, setActions }) => {
 
   const [formularios, setFormularios] = useState([]);
 
-  const buscarFormularios = async () => {
-    try {
-      const data = await fetchData(`forms`);
-      setFormularios(data);
-    } catch (err) {
-      console.error("Erro ao buscar formulários: " + err);
-      alerta.error("Erro ao buscar formulários");
-    }
-  };
-
   const [responsaveis, setResponsaveis] = useState([]);
 
   useEffect(() => {
+    const buscarFormularios = async () => {
+      try {
+        const data = await fetchData(`forms`);
+        setFormularios(data);
+      } catch (err) {
+        console.error("Erro ao buscar formulários: " + err);
+        alerta.error("Erro ao buscar formulários");
+      }
+    };
+
     const buscarResponsaveis = async () => {
       try {
         const data = await fetchData(`usuarios`);
 
-        setResponsaveis(
-          data
-            .filter((user) => user.contato !== null)
-            .map((user) => ({ ...user.contato, id: user.id }))
-        );
+        const responsaveisData = data
+          .filter((user) => user.contato !== null)
+          .map((user) => ({ ...user.contato, id: user.id }));
+
+        setResponsaveis(responsaveisData);
+
+        dadosEvento.responsavel = responsaveisData[0];
       } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
-        alerta.error("Erro ao buscar evento");
+        console.log("Erro ao buscar responsáveis: " + err);
+        alerta.error("Erro ao buscar responsáveis");
       }
     };
     buscarFormularios();
     buscarResponsaveis();
-  }, []);
+  }, [alerta]);
 
   const handleFormularioChange = (e) => {
     const formulario = formularios.find((f) => f.id === e.target.value);
@@ -223,6 +246,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
                 handleDadosChange={handleDadosChange}
                 dadosEvento={dadosEvento}
                 setDadosEvento={setDadosEvento}
+                handleErros={handleErros}
               />
             )}
 
@@ -259,6 +283,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
           <Botao
             onClick={handleProximo}
             sx={{ width: "100%", minWidth: 100 }}
+            disabled={!!podeAvancar}
             txt={step < qtdSteps - 1 ? "Próximo" : "Criar Evento"}
           />
         </Box>

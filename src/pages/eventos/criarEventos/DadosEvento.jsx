@@ -9,6 +9,7 @@ import { getUsuarios } from "../../../utils/dataMockUtil";
 import InputFile from "../../../components/input/InputFile";
 import BlockIcon from "@mui/icons-material/Block";
 import { useAlerta } from "../../../context/AlertaContext";
+import { useEffect, useRef } from "react";
 
 const DadosEvento = ({
   responsaveis,
@@ -20,6 +21,7 @@ const DadosEvento = ({
   handleResponsavelChange,
   imagem,
   setImagem,
+  handleErros,
 }) => {
   const handleTimeChange = (e, name) => {
     setDadosEvento({ ...dadosEvento, [name]: e.format("YYYY-MM-DDTHH:mm:ss") });
@@ -49,6 +51,12 @@ const DadosEvento = ({
     setImagem(null);
   };
 
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <>
       <Grid
@@ -70,16 +78,22 @@ const DadosEvento = ({
           value={dadosEvento.nome}
           name="nome"
           label="Nome"
+          handleErros={handleErros}
+          required
+          inputRef={inputRef}
         />
         <DataHora
           handleChange={(e) => handleTimeChange(e, "inicio")}
           value={dadosEvento.inicio != "" ? dayjs(dadosEvento.inicio) : null}
+          handleErros={handleErros}
           name="inicio"
           label="Início"
         />
         <DataHora
           handleChange={(e) => handleTimeChange(e, "fim")}
           value={dadosEvento.fim != "" ? dayjs(dadosEvento.fim) : null}
+          minDateTime={dayjs(dadosEvento.inicio)}
+          handleErros={handleErros}
           name="fim"
           label="Fim"
         />
@@ -89,6 +103,7 @@ const DadosEvento = ({
           startAdornment="R$"
           mascara="dinheiro"
           name="orcamento"
+          handleErros={handleErros}
           label="Orçamento"
         />
         <Picklist
