@@ -4,11 +4,14 @@ import img from "../../assets/evento-card-bg.png";
 import { useTheme } from "@emotion/react";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
-const CardDemanda = ({ date, evento, titulo }) => {
+const CardDemanda = ({ date, evento, titulo, handleClick }) => {
   const theme = useTheme();
 
   return (
-    <ButtonBase sx={{ width: { sm: "100%", md: 300 }, borderRadius: 2 }}>
+    <ButtonBase
+      sx={{ width: { sm: "100%", md: 300 }, borderRadius: 2 }}
+      onClick={handleClick}
+    >
       <Box
         sx={{
           width: { sm: "100%", md: 300 },

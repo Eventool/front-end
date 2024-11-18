@@ -66,7 +66,7 @@ const MenuPerfil = () => {
   };
 
   const handleClose = (e) => {
-    console.log(e.target.id);
+    //console.log(e.target.id);
     setAnchorEl(null);
   };
 
@@ -154,7 +154,7 @@ const Notificacoes = () => {
   };
 
   const handleClose = (e) => {
-    console.log(e.target.id);
+    //console.log(e.target.id);
     setAnchorEl(null);
   };
 

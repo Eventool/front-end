@@ -12,6 +12,6 @@ export const buscarDemandas = async () => {
 
     return response.data;
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };

@@ -6,11 +6,12 @@ import Grid from "@mui/material/Grid2";
 import Esteira from "../../../components/esteira/Esteira";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DadosDemanda from "./DadosDemanda";
-import CadastrarEscalas from "./CadastrarEscalas";
+import CriarEscalas from "./CriarEscalas";
 import TipoContrato from "./TipoContrato";
 import Finalizar from "./Finalizar";
 import { fetchData, postData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
+import dayjs from "dayjs";
 
 const CriarDemandas = ({ setTitulo, setActions }) => {
   const navigate = useNavigate();
@@ -33,11 +34,14 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
   };
 
   const handleConcluir = async () => {
-    const request = {
+    let request = {
       ...dadosDemanda,
       idEvento: dadosDemanda.evento.id,
       idResponsavel: dadosDemanda.responsavel?.id,
       tipoContrato: dadosDemanda.tipoContrato.id,
+      escalas: dadosDemanda.escalas.map((escala) => {
+        return { ...escala, funcaoEscala: escala.funcao.id };
+      }),
     };
 
     const response = await postData("demandas", request);
@@ -60,8 +64,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
 
   const [dadosDemanda, setDadosDemanda] = useState({
     nome: "",
-    inicio: "",
-    fim: "",
+    inicio: dayjs().add(2, "day").startOf("day").subtract(12, "hours"),
+    fim: dayjs().add(3, "day").startOf("day").subtract(12, "hours"),
     custoTotal: 0,
     responsavel: {
       id: "",
@@ -108,7 +112,7 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
         const data = await fetchData(`eventos`);
         setEventos(data);
       } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
+        //console.log("Erro ao buscar evento: " + err);
         alerta.error("Erro ao buscar evento");
       }
     };
@@ -127,7 +131,7 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
             .map((user) => ({ ...user.contato, id: user.id }))
         );
       } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
+        //console.log("Erro ao buscar evento: " + err);
         alerta.success("Erro ao buscar evento");
       }
     };
@@ -138,9 +142,13 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
   useEffect(() => {
     if (!eventId) return;
 
+    const evento = eventos.find((evento) => evento.id === eventId);
+
+    if (!evento) return;
+
     setDadosDemanda((prevState) => ({
       ...prevState,
-      evento: eventos.find((evento) => evento.id === eventId),
+      evento: evento,
     }));
   }, [eventId, eventos]);
 
@@ -167,7 +175,7 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
             )}
 
             {step === 1 && (
-              <CadastrarEscalas
+              <CriarEscalas
                 setDadosDemanda={setDadosDemanda}
                 dadosDemanda={dadosDemanda}
                 adicionarEscala={adicionarEscala}

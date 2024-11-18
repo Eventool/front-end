@@ -13,7 +13,7 @@ export const buscarEventos = async () => {
 
     return response.data;
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };
 
@@ -43,12 +43,11 @@ export const patchImgEvento = async (request, id) => {
 
     return response.data;
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };
 
 export const putEvento = async (request, id) => {
-  console.log(request);
   if (!(typeof request.orcamento === "number"))
     request.orcamento = request.orcamento.replaceAll(".", "").replace(",", ".");
   try {

@@ -9,13 +9,15 @@ import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Paper,
   Typography,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import imagemFundo from "../assets/Login.png";
-import { Password } from "@mui/icons-material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const Login = ({ setTitulo, setActions }) => {
   const { login } = useUser();
@@ -23,6 +25,12 @@ const Login = ({ setTitulo, setActions }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   useEffect(() => {
     setTitulo("");
@@ -42,7 +50,7 @@ const Login = ({ setTitulo, setActions }) => {
         login({ tipoUsuario });
         navigate("/");
       } catch (err) {
-        console.log(err);
+        //console.log(err);
       } finally {
         setLoading(false);
       }
@@ -104,6 +112,7 @@ const Login = ({ setTitulo, setActions }) => {
           name="email"
           value={dados.email}
           handleChange={handleChange}
+          textSize={{ min: 0, max: 64 }}
           startAdornment={<EmailIcon />}
           borderRadius={"9px"}
         />
@@ -126,8 +135,14 @@ const Login = ({ setTitulo, setActions }) => {
           name="senha"
           value={dados.senha}
           handleChange={handleChange}
-          type="password"
+          textSize={{ min: 0, max: 128 }}
+          type={showPassword ? "text" : "password"}
           startAdornment={<LockIcon />}
+          endAdornment={
+            <IconButton onClick={togglePasswordVisibility} edge="end">
+              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            </IconButton>
+          }
         />
 
         <Box sx={{ height: "17%" }} mt={4} className="flexRowCenter">

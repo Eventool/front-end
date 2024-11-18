@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useAlerta } from "../context/AlertaContext";
 
 export const fetchData = async (resource) => {
   try {
@@ -67,9 +66,33 @@ export const putData = async (resource, request, id) => {
       },
     });
 
-    return response;
+    return response.data;
   } catch (err) {
-    console.error(err.response.data);
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
+  }
+};
+
+export const deleteData = async (resource, id) => {
+  try {
+    const response = await axios.delete(`${urlData}${resource}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+      },
+    });
+
+    return response.data;
+  } catch (err) {
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
   }
 };
 

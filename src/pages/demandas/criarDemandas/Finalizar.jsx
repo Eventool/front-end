@@ -40,7 +40,7 @@ const Finalizar = ({ dadosDemanda, setDadosDemanda }) => {
         startAdornment="R$"
         value={(dadosDemanda.custoTotal + "").replace(".", ",")}
       />
-      <CampoTexto label="Responsável" value={dadosDemanda.responsavel?.nome} />
+      <CampoTexto label="Coordenador" value={dadosDemanda.responsavel?.nome} />
       <CampoTexto
         label="Tipo de Contrato"
         value={dadosDemanda.tipoContrato.value}

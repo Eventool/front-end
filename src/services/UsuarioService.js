@@ -15,7 +15,7 @@ export const logar = async (dados) => {
     
     Cookies.set('token', token);
 
-    console.log(Cookies.get('token'));
+    //console.log(Cookies.get('token'));
 
     sessionStorage.setItem("TOKEN", token);
     sessionStorage.setItem("ID", id);
@@ -24,7 +24,7 @@ export const logar = async (dados) => {
 
     return response.data; 
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };
 

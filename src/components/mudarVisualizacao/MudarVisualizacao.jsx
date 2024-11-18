@@ -64,6 +64,7 @@ const MudarVisualizacao = ({
     <Box className="flexRowBetween">
       <Box className="flexRowStart" gap={1}>
         <CampoTexto
+          textSize={{ min: 0, max: 48 }}
           style={{ borderRadius: "20px", height: "40px" }}
           margin="none"
           onKeyUp={handleSearchChange}

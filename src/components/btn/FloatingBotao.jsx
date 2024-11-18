@@ -2,7 +2,7 @@ import { Box, Button } from "@mui/material";
 import Botao from "./Botao";
 import { useCollapsed } from "../../context/CollapsedContext";
 
-const FloatingBotao = ({ handleSalvar, handleCancelar }) => {
+const FloatingBotao = ({ handleSalvar, handleCancelar, podeAvancar }) => {
   const { collapsed } = useCollapsed();
 
   return (
@@ -28,7 +28,8 @@ const FloatingBotao = ({ handleSalvar, handleCancelar }) => {
         color="primary"
         txt="Cancelar"
       />
-      <Botao onClick={handleSalvar} txt="Salvar" />
+
+      <Botao onClick={handleSalvar} txt="Salvar" disabled={podeAvancar} />
     </Box>
   );
 };

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import PageModal from "../components/pageModal/PageModal";
 import Imagem from "../components/imagem/Imagem";
-import { fetchData } from "../services/DataService";
+import { deleteData, fetchData, putData } from "../services/DataService";
 import { useNavigate, useParams } from "react-router-dom";
-import BlockIcon from "@mui/icons-material/Block";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import {
+  Autocomplete,
   Backdrop,
   Box,
   Button,
@@ -14,226 +14,171 @@ import {
   Chip,
   CircularProgress,
   Divider,
-  Paper,
-  Skeleton,
-  Tab,
-  Tabs,
+  TextField,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
-import img from "../assets/evento-card-bg.png";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTheme } from "@emotion/react";
-import { aplicarMascara } from "../utils/formatarUtil";
+import { aplicarMascara, getNestedValue } from "../utils/util";
 import dayjs from "dayjs";
 import OutlinedBox from "../components/box/OutlinedBox";
 import Mapa from "../mapa/Mapa";
 import CampoRegistro from "../components/input/CampoRegistro";
 import Tabela from "../components/tabela/Tabela";
-import { getDemandas } from "../utils/dataMockUtil";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { deleteEvento, putEvento } from "../services/EventoService";
 import DataHora from "../components/input/DataHora";
 import FloatingBotao from "../components/btn/FloatingBotao";
 import { useAlerta } from "../context/AlertaContext";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import EventoSkeleton from "../pages/eventos/EventoSkeleton";
 
 const Registro = ({
-  setTitulo,
-  setActions,
+  setTitulo = () => {},
+  setActions = () => {},
   toggleDialog,
   setDialogContent,
   setDialogAction,
+  struct,
 }) => {
   useEffect(() => {
     setTitulo("");
     setActions(null);
   }, []);
 
-  const { eventId } = useParams();
+  const { recordId } = useParams();
   const navigate = useNavigate();
   const alerta = useAlerta();
 
-  const [evento, setEvento] = useState(null);
-  const [eventoEditado, setEventoEditado] = useState(null);
+  const [objeto, setObjeto] = useState(null);
+  const [objetoEditado, setObjetoEditado] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(false);
 
   const guias = ["Detalhes", "Demandas", "Escalas"];
   const [guia, setGuia] = useState(guias[0]);
 
-  const guiaActions = [
-    {
-      id: 1,
-      label: "Adicionar demanda",
-      icon: <AssignmentIcon />,
-      action: () => {
-        navigate("/demandas/criar?eventId=" + evento.id);
-      },
-    },
-  ];
+  const [erros, setErros] = useState([]);
+  const [podeAvancar, setAvancar] = useState(false);
 
-  const columns = [
-    {
-      field: "nome",
-      headerName: "Nome",
-      flex: 2,
-    },
-    {
-      field: "inicio",
-      headerName: "Inicio",
-      type: "text",
-      flex: 1,
-    },
-    {
-      field: "fim",
-      headerName: "Fim",
-      type: "text",
-      flex: 1,
-    },
-    {
-      field: "responsavel",
-      headerName: "Responsável",
-      type: "text",
-      valueGetter: (params) => {
-        return params?.contato?.nome || "";
-      },
-      flex: 2,
-    },
-    {
-      field: "tipoContrato",
-      headerName: "Tipo Contrato",
-      type: "text",
-      flex: 1.5,
-    },
-    {
-      field: "custoTotal",
-      headerName: "Custo Total",
-      type: "text",
-      valueFormatter: (params) => {
-        return new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(params);
-      },
-      flex: 1,
-    },
-    {
-      field: "actions",
-      headerName: "Ações",
-      headerAlign: "center",
-      width: 160,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <span
-          style={{
-            display: "flex",
-            height: "100%",
-            justifyContent: "center",
-            padding: "6px",
-          }}
-        >
-          <ButtonBase
-            key={`view-${params.id}`}
-            sx={{ marginRight: 0.5, borderRadius: 2 }}
-            onClick={() => navigate("/demandas/" + params.id)}
-          >
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              width={39}
-            >
-              <VisibilityIcon sx={{ color: "#515151" }} />
-            </Box>
-          </ButtonBase>
-        </span>
-      ),
-    },
-  ];
+  const handleErros = (e) => {
+    console.log(erros);
+    setErros((prevState) => ({
+      ...prevState,
+      [e.name]: e.value,
+    }));
+  };
 
-  const handleEditarEvento = () => {
+  useEffect(() => {
+    setAvancar(() => {
+      const campos = Object.keys(erros);
+      for (let i = 0; i < campos.length; i++) {
+        if (erros[campos[i]]) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }, [erros]);
+
+  const handleEditarObjeto = () => {
     setEditando(true);
   };
 
   const handleCampoChange = (e, name) => {
-    setEventoEditado({ ...eventoEditado, [name]: e.target.value });
+    setObjetoEditado({ ...objetoEditado, [name]: e.target.value });
+  };
+
+  const handleAutocompleteChange = (event, newValue, value) => {
+    const [a, b] = value.split(".");
+
+    if (newValue && b) {
+      setObjetoEditado((prevState) => ({
+        ...prevState,
+        [a]: {
+          ...prevState[a],
+          [b]: newValue.id,
+        },
+      }));
+    }
   };
 
   const handleSalvar = async () => {
-    const response = await putEvento(eventoEditado, evento.id);
+    const request = { ...objetoEditado };
 
-    if (!response) {
-      alerta.error("Erro ao atualizar evento");
+    const response = await putData(struct.object.resource, request, objeto.id);
+
+    if (response.error) {
+      alerta.error("Erro ao atualizar objeto");
       return;
     }
 
-    setEvento({ ...response });
+    setObjeto({ ...response });
     setEditando(false);
-    alerta.success(`Evento ${response.nome} atualizado com sucesso`);
+    alerta.success(`Objeto ${response.nome} atualizado com sucesso`);
   };
 
   const handleCancelar = () => {
-    setEventoEditado({ ...evento });
+    setObjetoEditado({ ...objeto });
     setEditando(false);
   };
 
-  const handleEnderecoChange = (e, name) => {
-    let novoEndereco = eventoEditado.endereco;
+  const handleEnderecoChange = (e, name, obj) => {
+    let novoEndereco = objetoEditado[obj];
     novoEndereco = { ...novoEndereco, [name]: e.target.value };
-    setEventoEditado({ ...eventoEditado, endereco: novoEndereco });
+    setObjetoEditado({ ...objetoEditado, endereco: novoEndereco });
   };
 
   const handleTimeChange = (e, name) => {
-    setEventoEditado({
-      ...eventoEditado,
+    setObjetoEditado({
+      ...objetoEditado,
       [name]: e.format("YYYY-MM-DDTHH:mm:ss"),
     });
   };
 
   useEffect(() => {
-    const buscarEvento = async () => {
-      try {
-        const data = await fetchData(`eventos/${eventId}`);
-        console.log(data);
-        setEvento(data);
-        setEventoEditado(data);
+    const buscarObjeto = async () => {
+      const data = await fetchData(`${struct.object.resource}/${recordId}`);
+
+      if (data.error) {
         setTimeout(() => {
+          alerta.error("Erro ao buscar objeto");
           setLoading(false);
+          navigate("/", struct.object.resource);
         }, 1000);
-      } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
-        alerta.error("Erro ao buscar evento");
       }
+
+      setObjeto(data);
+      setObjetoEditado(data);
+
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     };
 
-    buscarEvento();
-  }, []);
+    buscarObjeto();
+  }, [struct]);
 
   const handleDeletar = async () => {
     setDialogContent({
       title: "Deseja excluir?",
       body: (
         <>
-          O evento <b>{evento.nome}</b> será excluido permanentemente
+          O objeto <b>{objeto.nome}</b> será excluido permanentemente
         </>
       ),
     });
 
     setDialogAction(() => async () => {
-      const { status } = await deleteEvento(evento.id);
+      const { status } = await deleteData(objeto.id);
 
       if (status !== 204) {
-        alerta.error("Erro ao excluir evento", "error");
+        alerta.error("Erro ao excluir objeto", "error");
         return;
       }
 
-      alerta.success("Evento excluido com sucesso");
+      alerta.success("Objeto excluido com sucesso");
 
-      navigate("/eventos");
+      navigate("/", struct.object.resource);
     });
 
     toggleDialog();
@@ -260,7 +205,6 @@ const Registro = ({
       >
         <CircularProgress />
       </Backdrop>
-      {/* {loading && <EventoSkeleton />} */}
       {!loading && (
         <Box mb={1} className="flexRowBetween">
           <Box className="flexRowCenter" gap={1}>
@@ -273,11 +217,11 @@ const Registro = ({
             >
               <ArrowBackIosIcon fontSize="32px" />
             </ButtonBase>
-            <Typography variant="h6">Evento</Typography>
+            <Typography variant="h6">{struct.object.name}</Typography>
           </Box>
         </Box>
       )}
-      {!loading && evento && (
+      {!loading && objeto && (
         <>
           <Box
             sx={(theme) => ({
@@ -294,52 +238,64 @@ const Registro = ({
               sx={{ alignItems: "flex-end" }}
             >
               <Box className="flexRowCenter">
-                <Typography variant="h5">{evento.nome}</Typography>
+                <Typography variant="h5">{objeto.nome}</Typography>
               </Box>
               <Box className="flexRowStart" sx={{ gap: 10 }}>
-                <Box className="flexColumnStart">
-                  <Typography ml={1} variant="subtitle1">
-                    Status
-                  </Typography>
-                  <Chip
-                    title="Status do evento"
-                    color={
-                      evento.status !== "Em andamento" ? "secondary" : "primary"
-                    }
-                    variant={
-                      evento.status === "Não iniciado" ? "outlined" : "filled"
-                    }
-                    label={
-                      <Typography variant="subtitle1">
-                        {evento.status}
+                {struct.header.fields.map((item, index) => {
+                  return (
+                    <Box key={index} className="flexColumnStart">
+                      <Typography variant="subtitle1">{item.name}</Typography>
+                      <Typography title={item.name} variant="h6">
+                        <>
+                          {(() => {
+                            const value = getNestedValue(objeto, item.value);
+
+                            switch (item.type) {
+                              case "text":
+                                return value;
+                              case "statusChip":
+                                return (
+                                  <Chip
+                                    title={value}
+                                    color={
+                                      value !== "Em andamento"
+                                        ? "secondary"
+                                        : "primary"
+                                    }
+                                    variant={
+                                      value === "Não iniciado"
+                                        ? "outlined"
+                                        : "filled"
+                                    }
+                                    label={
+                                      <Typography variant="subtitle1">
+                                        {value}
+                                      </Typography>
+                                    }
+                                  />
+                                );
+                              case "currency":
+                                return (
+                                  <>
+                                    <small>R$ </small>
+                                    {aplicarMascara(
+                                      value.toFixed(2),
+                                      "dinheiro"
+                                    )}
+                                  </>
+                                );
+                              case "date":
+                                return dayjs(value).format("DD/MM/YYYY HH:mm");
+
+                              default:
+                                break;
+                            }
+                          })()}
+                        </>
                       </Typography>
-                    }
-                  />
-                </Box>
-
-                <Box className="flexColumnStart">
-                  <Typography variant="subtitle1">Orçamento</Typography>
-                  <Typography variant="h6">
-                    <small>R$</small>{" "}
-                    {aplicarMascara(evento.orcamento.toFixed(2), "dinheiro")}
-                  </Typography>
-                </Box>
-
-                <Box className="flexColumnStart">
-                  <Typography variant="subtitle1">Data do evento</Typography>
-                  <Typography variant="h6">
-                    {dayjs(evento.inicio).format("DD/MM/YYYY HH:mm")}
-                  </Typography>
-                </Box>
-
-                <Box className="flexColumnStart">
-                  <Typography variant="subtitle1">Responsável</Typography>
-                  <Typography variant="h6">
-                    {evento.responsavel?.contato
-                      ? evento.responsavel?.contato.nome
-                      : "-"}
-                  </Typography>
-                </Box>
+                    </Box>
+                  );
+                })}
               </Box>
               <Box className="flexRowCenter" gap={1}>
                 <Button
@@ -347,7 +303,7 @@ const Registro = ({
                   variant="contained"
                   color="secondary"
                   startIcon={<EditIcon />}
-                  onClick={handleEditarEvento}
+                  onClick={handleEditarObjeto}
                 >
                   Editar
                 </Button>
@@ -363,168 +319,212 @@ const Registro = ({
             </Box>
             <Divider />
           </Box>
-          <Box className="flexRowBetween">
-            <Imagem imagem={evento.imagem} placeholder={img} />
-            <Box></Box>
-          </Box>
-          <Guias
-            guiaAtual={guia}
-            guias={guias}
-            setGuia={setGuia}
-            guiaActions={guiaActions}
-          />
+          {struct.image && (
+            <Box className="flexRowBetween">
+              <Imagem
+                imagem={objetoEditado.imagem}
+                placeholder={struct.image.placeholder}
+              />
+            </Box>
+          )}
+          <Box>
+            <Guias
+              guiaAtual={guia}
+              guias={struct.tabs}
+              setGuia={setGuia}
+              guiaActions={struct.tabsAction}
+              objeto={objeto}
+            />
 
-          <OutlinedBox sx={{ mt: 3 }}>
-            {guia === guias[0] && (
+            <OutlinedBox sx={{ mt: 3 }}>
               <Box>
                 <Grid container rowGap={3} columnSpacing={2}>
-                  <Grid size={12}>
-                    <Typography variant="h6" component="h6">
-                      Evento
-                    </Typography>
-                  </Grid>
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleCampoChange}
-                    name="nome"
-                    label="Nome"
-                    value={eventoEditado.nome}
-                  />
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleCampoChange}
-                    name="orcamento"
-                    label="Orçamento"
-                    startAdornment={"R$"}
-                    value={`${aplicarMascara(
-                      eventoEditado.orcamento.toFixed(2),
-                      "dinheiro"
-                    )}`}
-                  />
-                  {!editando && (
-                    <>
-                      <CampoRegistro
-                        editando={editando}
-                        handleChange={handleCampoChange}
-                        name="inicio"
-                        label="Início"
-                        value={dayjs(eventoEditado.inicio).format(
-                          "DD/MM/YYYY HH:mm"
-                        )}
-                      />
-                      <CampoRegistro
-                        editando={editando}
-                        handleChange={handleCampoChange}
-                        name="fim"
-                        label="Fim"
-                        value={dayjs(eventoEditado.fim).format(
-                          "DD/MM/YYYY HH:mm"
-                        )}
-                      />
-                    </>
-                  )}
-                  {editando && (
-                    <>
-                      <DataHora
-                        editando={editando}
-                        handleChange={(e) => handleTimeChange(e, "inicio")}
-                        name="inicio"
-                        label="Início"
-                        value={dayjs(eventoEditado.inicio)}
-                      />
-                      <DataHora
-                        editando={editando}
-                        handleChange={(e) => handleTimeChange(e, "fim")}
-                        name="fim"
-                        label="Fim"
-                        value={dayjs(eventoEditado.fim)}
-                      />
-                    </>
-                  )}
-                  <CampoRegistro
-                    editando={false}
-                    name="formulario"
-                    label="Formulário"
-                    value={eventoEditado.formulario?.nome}
-                  />
-                  <CampoRegistro
-                    editando={false}
-                    name="responsavel"
-                    label="Responsável"
-                    value={
-                      eventoEditado.responsavel?.contato
-                        ? eventoEditado.responsavel?.contato.nome
-                        : "-"
-                    }
-                  />
-                  <Divider />
-                  <Grid size={12}>
-                    <Typography variant="h6" component="h6">
-                      Endereço
-                    </Typography>
-                  </Grid>
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleEnderecoChange}
-                    name="logradouro"
-                    label="Logradouro"
-                    value={eventoEditado.endereco?.logradouro}
-                  />
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleEnderecoChange}
-                    name="numero"
-                    label="Número"
-                    value={eventoEditado.endereco?.numero}
-                  />
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleEnderecoChange}
-                    name="cep"
-                    label="CEP"
-                    value={eventoEditado.endereco?.cep}
-                  />
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleEnderecoChange}
-                    name="cidade"
-                    label="Cidade"
-                    value={eventoEditado.endereco?.cidade}
-                  />
-                  <CampoRegistro
-                    editando={editando}
-                    handleChange={handleEnderecoChange}
-                    name="estado"
-                    label="Estado"
-                    value={eventoEditado.endereco?.uf}
-                  />
+                  {struct.tabs.map((tab) => {
+                    if (tab.name !== guia) return;
+
+                    return tab.sections.map((section, index) => {
+                      if (section.columns)
+                        return (
+                          <Grid key={index} size={12}>
+                            <Tabela
+                              columns={section.columns}
+                              rows={objeto[section.rowsValue]}
+                            />
+                          </Grid>
+                        );
+
+                      if (section.fields)
+                        return (
+                          <>
+                            <Grid container rowGap={3} columnSpacing={2}>
+                              <Grid size={12}>
+                                <Typography
+                                  key={index}
+                                  variant="h6"
+                                  component="h6"
+                                >
+                                  {section.name}
+                                </Typography>
+                              </Grid>
+
+                              {section.fields.map((field, index) => {
+                                let value = getNestedValue(
+                                  objetoEditado,
+                                  field.value
+                                );
+
+                                switch (field.type) {
+                                  case "dinheiro":
+                                    return (
+                                      <CampoRegistro
+                                        handleErros={handleErros}
+                                        key={index}
+                                        editando={editando}
+                                        handleChange={handleCampoChange}
+                                        name={field.name}
+                                        label={field.label}
+                                        startAdornment={"R$"}
+                                        mascara={
+                                          editando ? "numero" : "dinheiro"
+                                        }
+                                        errorMsg={field.errorMsg}
+                                        value={aplicarMascara(
+                                          value,
+                                          "dinheiro"
+                                        )}
+                                      />
+                                    );
+
+                                  case "date":
+                                    return (
+                                      (editando && (
+                                        <DataHora
+                                          minDateTime={dayjs(
+                                            objetoEditado[field.minDateTime]
+                                          )}
+                                          handleErros={handleErros}
+                                          key={index}
+                                          editando={editando}
+                                          handleChange={(e) =>
+                                            handleTimeChange(e, field.name)
+                                          }
+                                          name={field.name}
+                                          label={field.label}
+                                          value={dayjs(value)}
+                                          errorMsg={field.errorMsg}
+                                          erros={erros}
+                                        />
+                                      )) ||
+                                      (!editando && (
+                                        <CampoRegistro
+                                          key={index}
+                                          editando={editando}
+                                          handleChange={handleCampoChange}
+                                          name={field.name}
+                                          label={field.label}
+                                          value={dayjs(value).format(
+                                            "DD/MM/YYYY HH:mm"
+                                          )}
+                                        />
+                                      ))
+                                    );
+
+                                  case "picklist":
+                                    return (
+                                      (editando && (
+                                        <Grid size={6} key={index} mt={2}>
+                                          <Autocomplete
+                                            disablePortal
+                                            options={field.options}
+                                            getOptionLabel={(option) =>
+                                              option.value
+                                            }
+                                            value={
+                                              field.options.find(
+                                                (estado) => estado.id === value
+                                              ) || null
+                                            }
+                                            onChange={(event, newValue) =>
+                                              handleAutocompleteChange(
+                                                event,
+                                                newValue,
+                                                field.value
+                                              )
+                                            }
+                                            renderInput={(params) => (
+                                              <TextField
+                                                {...params}
+                                                label={field.label}
+                                              />
+                                            )}
+                                          />
+                                        </Grid>
+                                      )) ||
+                                      (!editando && (
+                                        <CampoRegistro
+                                          key={index}
+                                          editando={editando}
+                                          name={field.name}
+                                          label={field.label}
+                                          value={value}
+                                        />
+                                      ))
+                                    );
+                                  case "mapa":
+                                    return (
+                                      <Box
+                                        width="100%"
+                                        className="flexRowCenter"
+                                        key={index}
+                                      >
+                                        <Mapa endereco={objeto[field.value]} />
+                                      </Box>
+                                    );
+                                  default:
+                                    return (
+                                      <CampoRegistro
+                                        handleErros={handleErros}
+                                        key={index}
+                                        editando={editando}
+                                        imutavel={field.immutable}
+                                        handleChange={
+                                          section.nested
+                                            ? (e) =>
+                                                handleEnderecoChange(
+                                                  e,
+                                                  e.target.name,
+                                                  section.value
+                                                )
+                                            : (e) =>
+                                                handleCampoChange(
+                                                  e,
+                                                  e.target.name
+                                                )
+                                        }
+                                        name={field.name}
+                                        label={field.label}
+                                        value={value}
+                                        errorMsg={field.errorMsg}
+                                      />
+                                    );
+                                }
+                              })}
+                            </Grid>
+                          </>
+                        );
+                    });
+                  })}
                 </Grid>
-                <Box className="flexRowCenter" mt={3}>
-                  <Mapa
-                    logradouro={eventoEditado.endereco?.logradouro}
-                    cidade={eventoEditado.endereco?.cidade}
-                    uf={eventoEditado.endereco?.uf}
-                    popup={eventoEditado.nome}
-                  />
-                </Box>
+                <Box className="flexRowCenter" mt={3}></Box>
               </Box>
-            )}
-            {guia === guias[1] && (
-              <Box sx={{ bgcolor: "#fcfcfc" }}>
-                <Tabela columns={columns} rows={evento.demandas} />
-              </Box>
-            )}
-            {guia === guias[2] && (
-              <>
-                <Tabela columns={columns} rows={getDemandas} />
-              </>
-            )}
-          </OutlinedBox>
+            </OutlinedBox>
+          </Box>
         </>
       )}
 
       {editando && (
         <FloatingBotao
+          podeAvancar={podeAvancar}
           handleSalvar={handleSalvar}
           handleCancelar={handleCancelar}
         />
@@ -533,8 +533,9 @@ const Registro = ({
   );
 };
 
-const Guias = ({ guias, guiaAtual, setGuia, guiaActions }) => {
+const Guias = ({ guias, guiaAtual, setGuia, guiaActions, objeto }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   return (
     <Box className="flexRowBetween">
@@ -548,20 +549,20 @@ const Guias = ({ guias, guiaAtual, setGuia, guiaActions }) => {
         gap={5}
       >
         {guias &&
-          guias.map((item, index) => {
+          guias.map(({ name }, index) => {
             return (
               <ButtonBase
                 disableRipple
-                onClick={() => setGuia(item)}
+                onClick={() => setGuia(name)}
                 sx={{
                   borderBottom: `2px solid ${
-                    guiaAtual === item ? theme.palette.secondary.main : null
+                    guiaAtual === name ? theme.palette.secondary.main : null
                   }`,
                   pb: "4px",
                 }}
                 key={index}
               >
-                <Typography>{item}</Typography>
+                <Typography>{name}</Typography>
               </ButtonBase>
             );
           })}
@@ -574,9 +575,24 @@ const Guias = ({ guias, guiaAtual, setGuia, guiaActions }) => {
           sx={{ alignSelf: "flex-end", mr: 2 }}
         >
           {guiaActions.map((item, index) => {
+            let action;
+
+            switch (item.type) {
+              case "navigate":
+                action = () => navigate(`${item.action}${objeto.id}`);
+                break;
+              case "function":
+                action = item.action;
+                break;
+
+              default:
+                action = () => {};
+                break;
+            }
+
             return (
-              item.id === guias.indexOf(guiaAtual) && (
-                <Button startIcon={item.icon} key={index} onClick={item.action}>
+              item.id === guiaAtual && (
+                <Button startIcon={item.icon} key={index} onClick={action}>
                   {item.label}
                 </Button>
               )

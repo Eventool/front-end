@@ -6,16 +6,9 @@ import Botao from "../../../components/btn/Botao";
 import PillContainer from "../../../components/pill/Pill";
 import { funcoesAlocacao } from "../../../utils/dataMockUtil";
 import { useState } from "react";
-import { useTheme } from "@emotion/react";
 import OutlinedBox from "../../../components/box/OutlinedBox";
 
-const CadastrarEscalas = ({
-  dadosDemanda,
-  setDadosDemanda,
-  adicionarEscala,
-}) => {
-  const theme = useTheme();
-
+const CriarEscalas = ({ dadosDemanda, setDadosDemanda, adicionarEscala }) => {
   const setEscalas = (escala) => {
     setDadosDemanda({ ...dadosDemanda, escalas: escala });
   };
@@ -26,7 +19,7 @@ const CadastrarEscalas = ({
       value: "",
     },
     qtdColaborador: "",
-    qtdHora: "",
+    horasJornada: "",
     valor: "",
   });
 
@@ -46,7 +39,7 @@ const CadastrarEscalas = ({
       id: escalas.length > 0 ? escalas[escalas.length - 1].id + 1 : 0,
       funcao: escalaAtual.funcao,
       qtdColaborador: escalaAtual.qtdColaborador,
-      qtdHora: escalaAtual.qtdHora,
+      horasJornada: escalaAtual.horasJornada,
       valor: escalaAtual.valor,
     };
 
@@ -64,7 +57,7 @@ const CadastrarEscalas = ({
         value: "",
       },
       qtdColaborador: "",
-      qtdHora: "",
+      horasJornada: "",
       valor: "",
     });
   };
@@ -104,14 +97,16 @@ const CadastrarEscalas = ({
             name="qtdColaborador"
             value={escalaAtual.qtdColaborador}
             label="Qtd Colaboradores"
+            textSize={{ min: 0, max: 48 }}
           />
           <CampoTexto
             size={12}
             handleChange={handleChange}
             mascara="numeroPositivo"
-            name="qtdHora"
-            value={escalaAtual.qtdHora}
-            label="Qtd Horas"
+            name="horasJornada"
+            value={escalaAtual.horasJornada}
+            label="Horas da Jornada"
+            textSize={{ min: 0, max: 48 }}
           />
           <CampoTexto
             size={12}
@@ -120,6 +115,7 @@ const CadastrarEscalas = ({
             name="valor"
             value={escalaAtual.valor}
             startAdornment="R$"
+            textSize={{ min: 0, max: 48 }}
             label="Valor"
           />
           <Botao
@@ -147,4 +143,4 @@ const CadastrarEscalas = ({
   );
 };
 
-export default CadastrarEscalas;
+export default CriarEscalas;

@@ -72,7 +72,7 @@ const Cadastro = ({ setTitulo, setActions }) => {
         navigate("/login");
       } catch (err) {
         alerta.error("Não foi possivel realizar o cadastro");
-        console.log(err);
+        //console.log(err);
       } finally {
         setLoading(false);
       }

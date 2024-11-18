@@ -19,7 +19,7 @@ import DemandasFechadas from "../pages/demandas/DemandasFechadas";
 import Dashboard from "../pages/Dashboard";
 import CriarDemandas from "../pages/demandas/criarDemandas/CriarDemandas";
 import Escala from "../pages/Escala";
-import Formularios from "../pages/Formularios";
+import Formularios from "../pages/formulario/Formularios";
 import Parceiros from "../pages/Parceiros";
 import Breadcrumb from "../components/breadcrumb/Breadcrumb";
 import Home from "../pages/Home";
@@ -40,6 +40,8 @@ import BuscarEventos from "../pages/colaborador/BuscarEventos";
 import Configuracoes from "../pages/Configuracoes";
 import { useCollapsed } from "../context/CollapsedContext";
 import Cadastro from "../pages/Cadastro";
+import RegistroDemanda from "../pages/demandas/RegistroDemanda";
+import RegistroFormulario from "../pages/formulario/RegistroFormulario";
 
 const Layout = () => {
   // const [collapsed, setCollapsed] = useState(
@@ -200,9 +202,21 @@ const Layout = () => {
                   }
                 />
                 <Route
-                  path="/eventos/:eventId"
+                  path="/eventos/:recordId"
                   element={
                     <RegistroEvento
+                      toggleDialog={toggleDialog}
+                      setDialogAction={setDialogAction}
+                      setDialogContent={setDialogContent}
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
+                  }
+                />
+                <Route
+                  path="/demandas/:recordId"
+                  element={
+                    <RegistroDemanda
                       toggleDialog={toggleDialog}
                       setDialogAction={setDialogAction}
                       setDialogContent={setDialogContent}
@@ -215,24 +229,6 @@ const Layout = () => {
                   path="/eventos/criar"
                   element={
                     <CriarEvento
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/eventos-abertos"
-                  element={
-                    <EventosAbertos
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/eventos-fechados"
-                  element={
-                    <EventosFechados
                       setTitulo={setTitulo}
                       setActions={setActions}
                     />
@@ -254,24 +250,6 @@ const Layout = () => {
                   }
                 />
                 <Route
-                  path="/demandas-abertas"
-                  element={
-                    <DemandasAbertas
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/demandas-fechadas"
-                  element={
-                    <DemandasFechadas
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
                   path="/escala"
                   element={
                     <Escala setTitulo={setTitulo} setActions={setActions} />
@@ -281,6 +259,21 @@ const Layout = () => {
                   path="/formularios"
                   element={
                     <Formularios
+                      toggleDialog={toggleDialog}
+                      setDialogAction={setDialogAction}
+                      setDialogContent={setDialogContent}
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
+                  }
+                />
+                <Route
+                  path="/formularios/:recordId"
+                  element={
+                    <RegistroFormulario
+                      toggleDialog={toggleDialog}
+                      setDialogAction={setDialogAction}
+                      setDialogContent={setDialogContent}
                       setTitulo={setTitulo}
                       setActions={setActions}
                     />

@@ -77,7 +77,7 @@ const DadosDemanda = ({
           itemParam="nome"
           items={responsaveis}
           name="responsavel"
-          label={"Responsável"}
+          label={"Coordenador"}
           handleChange={handleResponsavelChange}
           value={dadosDemanda.responsavel?.id}
         />

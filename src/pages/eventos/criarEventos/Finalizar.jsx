@@ -14,7 +14,7 @@ const Finalizar = ({ dadosEvento, setDadosEvento }) => {
       </Grid>
       <CampoRegistro size={12} label="Nome" value={dadosEvento.nome} />
       <CampoRegistro
-        label="Responsável"
+        label="Coordenador"
         value={dadosEvento.responsavel?.nome}
       />
       <CampoRegistro

@@ -15,7 +15,7 @@ const Pill = ({ num, label, idFunc, handleClick, handleDelete }) => {
 
 const PillContainer = ({ pills, setPills }) => {
   const handleClick = (id) => {
-    console.log(pills.filter((pill) => pill.id === id));
+    //console.log(pills.filter((pill) => pill.id === id));
   };
 
   const handleDelete = (id) => {

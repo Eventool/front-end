@@ -12,6 +12,7 @@ import Finalizar from "./Finalizar";
 import { postEvento } from "../../../services/EventoService";
 import { fetchData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
+import dayjs from "dayjs";
 
 const CriarEvento = ({ setTitulo, setActions }) => {
   useEffect(() => {
@@ -73,8 +74,8 @@ const CriarEvento = ({ setTitulo, setActions }) => {
   const [dadosEvento, setDadosEvento] = useState({
     nome: "",
     orcamento: "0,00",
-    inicio: "",
-    fim: "",
+    inicio: dayjs().add(2, "day").startOf("day").subtract(12, "hours"),
+    fim: dayjs().add(3, "day").startOf("day").subtract(12, "hours"),
     responsavel: {
       id: "",
       nome: "",
@@ -96,6 +97,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
   const [podeAvancar, setAvancar] = useState(false);
 
   const handleErros = (e) => {
+    //console.log(erros);
     setErros((prevState) => ({
       ...prevState,
       [e.name]: e.value,
@@ -103,7 +105,6 @@ const CriarEvento = ({ setTitulo, setActions }) => {
   };
 
   useEffect(() => {
-    console.log(erros);
     setAvancar(() => {
       const campos = Object.keys(erros);
       for (let i = 0; i < campos.length; i++) {
@@ -180,7 +181,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
 
         dadosEvento.responsavel = responsaveisData[0];
       } catch (err) {
-        console.log("Erro ao buscar responsáveis: " + err);
+        //console.log("Erro ao buscar responsáveis: " + err);
         alerta.error("Erro ao buscar responsáveis");
       }
     };
@@ -247,6 +248,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
                 dadosEvento={dadosEvento}
                 setDadosEvento={setDadosEvento}
                 handleErros={handleErros}
+                erros={erros}
               />
             )}
 

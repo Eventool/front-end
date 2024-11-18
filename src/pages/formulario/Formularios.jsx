@@ -19,13 +19,24 @@ import CreateIcon from "@mui/icons-material/Create";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
-import { getFormularios } from "../utils/dataMockUtil";
-import Botao from "../components/btn/Botao";
+import { getFormularios } from "../../utils/dataMockUtil";
+import Botao from "../../components/btn/Botao";
 import { useNavigate } from "react-router-dom";
-import { fetchData, postData, putData } from "../services/DataService";
-import { useAlerta } from "../context/AlertaContext";
+import {
+  deleteData,
+  fetchData,
+  postData,
+  putData,
+} from "../../services/DataService";
+import { useAlerta } from "../../context/AlertaContext";
 
-const Formularios = ({ setTitulo, setActions }) => {
+const Formularios = ({
+  setTitulo,
+  setActions,
+  toggleDialog,
+  setDialogContent,
+  setDialogAction,
+}) => {
   const theme = useTheme();
   const alerta = useAlerta();
 
@@ -55,19 +66,18 @@ const Formularios = ({ setTitulo, setActions }) => {
     setActions(actions);
   }, [setActions, formulario, novoFormulario]);
 
-  const buscarFormularios = async () => {
-    try {
-      const data = await fetchData(`forms`);
-      setFormularios(data);
-    } catch (err) {
-      console.log("Erro ao buscar formulários: " + err);
-      alerta.error("Erro ao buscar formulários");
-    }
-  };
-
   useEffect(() => {
-    buscarFormularios();
-  }, []);
+    (async () => {
+      const response = await fetchData(`forms`);
+
+      if (response.error) {
+        alerta.error("Erro ao buscar formulários");
+        return;
+      }
+
+      setFormularios(response);
+    })();
+  }, [setFormularios, alerta]);
 
   const openEditarDialog = (formulario) => {
     setFormulario(formulario);
@@ -83,19 +93,19 @@ const Formularios = ({ setTitulo, setActions }) => {
   };
 
   const handleEditarFormularios = async (novoFormularioAtualizado) => {
-    const { data, status } = await putData(
+    const response = await putData(
       "forms",
       novoFormularioAtualizado,
       novoFormularioAtualizado.id
     );
 
-    if (status !== 200) {
-      console.error(data);
+    if (response.error) {
+      console.error(response);
       return;
     }
 
+    alerta.success("Formulário atualizado com sucesso.");
     closeEditarDialog();
-    buscarFormularios();
   };
 
   const closeNovoDialog = () => {
@@ -107,14 +117,15 @@ const Formularios = ({ setTitulo, setActions }) => {
   };
 
   const handleCriarFormulario = async () => {
-    const { data, status } = await postData("forms", novoFormulario);
+    const response = await postData("forms", novoFormulario);
 
-    if (status !== 201) {
-      console.error("Erro ao criar formulário: ", data);
+    if (response.error) {
+      alerta.error("Erro ao criar formulário.");
       return;
     }
 
-    console.log(data, status);
+    alerta.success("Formulário criado com sucesso.");
+    closeNovoDialog();
   };
 
   return (
@@ -141,6 +152,12 @@ const Formularios = ({ setTitulo, setActions }) => {
                 theme={theme}
                 formulario={formulario}
                 openEditarDialog={openEditarDialog}
+                toggleDialog={toggleDialog}
+                setDialogAction={setDialogAction}
+                setDialogContent={setDialogContent}
+                setTitulo={setTitulo}
+                setActions={setActions}
+                alerta={alerta}
               />
             );
           })}
@@ -149,14 +166,50 @@ const Formularios = ({ setTitulo, setActions }) => {
   );
 };
 
-const CardFormulario = ({ formulario, theme, openEditarDialog }) => {
-  const alerta = useAlerta();
+const CardFormulario = ({
+  formulario,
+  theme,
+  openEditarDialog,
+  toggleDialog,
+  setDialogContent,
+  setDialogAction,
+  alerta,
+}) => {
+  const navigate = useNavigate();
 
   const handleCopyClick = (formulario) => {
     navigator.clipboard.writeText(formulario.url);
     alerta.success(
       `Link para formulário ${formulario.nome} copiado para área de transferência`
     );
+  };
+
+  const handleClick = () => {
+    navigate("/formularios/" + formulario.id);
+  };
+
+  const handleDeletar = async () => {
+    setDialogContent({
+      title: "Deseja excluir?",
+      body: (
+        <>
+          O objeto <b>{formulario.nome}</b> será excluido permanentemente
+        </>
+      ),
+    });
+
+    setDialogAction(() => async () => {
+      const response = await deleteData("forms", formulario.id);
+
+      if (response.error) {
+        alerta.error("Erro ao excluir objeto", "error");
+        return;
+      }
+
+      alerta.success(`Formulário ${formulario.nome} excluido com sucesso`);
+    });
+
+    toggleDialog();
   };
 
   return (
@@ -167,7 +220,21 @@ const CardFormulario = ({ formulario, theme, openEditarDialog }) => {
       className="flexRowBetween"
     >
       <Box className="flexRowCenter" gap={2}>
-        <Typography fontSize={16}>{formulario.nome}</Typography>
+        <Typography
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") handleClick();
+          }}
+          role="button"
+          tabIndex={0}
+          sx={{
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
+          onClick={() => handleClick()}
+          fontSize={16}
+        >
+          {formulario.nome}
+        </Typography>
         <Divider orientation="vertical" flexItem />
         <Typography fontSize={14} color="#5e5e5e">
           {formulario.url}
@@ -186,7 +253,7 @@ const CardFormulario = ({ formulario, theme, openEditarDialog }) => {
             </Button>
           </Tooltip>
           <Tooltip title="Excluir">
-            <Button>
+            <Button onClick={handleDeletar}>
               <DeleteIcon />
             </Button>
           </Tooltip>

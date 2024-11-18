@@ -22,6 +22,7 @@ const DadosEvento = ({
   imagem,
   setImagem,
   handleErros,
+  erros,
 }) => {
   const handleTimeChange = (e, name) => {
     setDadosEvento({ ...dadosEvento, [name]: e.format("YYYY-MM-DDTHH:mm:ss") });
@@ -88,6 +89,8 @@ const DadosEvento = ({
           handleErros={handleErros}
           name="inicio"
           label="Início"
+          erros={erros}
+          errorMsg="O início não pode ser anterior ao presente."
         />
         <DataHora
           handleChange={(e) => handleTimeChange(e, "fim")}
@@ -96,6 +99,8 @@ const DadosEvento = ({
           handleErros={handleErros}
           name="fim"
           label="Fim"
+          erros={erros}
+          errorMsg="O fim não pode ser anterior ao início."
         />
         <CampoTexto
           handleChange={handleDadosChange}
@@ -112,7 +117,7 @@ const DadosEvento = ({
           handleChange={handleResponsavelChange}
           value={dadosEvento.responsavel?.id}
           name="formulario"
-          label="Responsável"
+          label="Coordenador"
         />
         <Picklist
           itemParam="nome"

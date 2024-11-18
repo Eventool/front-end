@@ -1,7 +1,7 @@
 import { InputAdornment, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React, { useEffect, useState } from "react";
-import { aplicarMascara } from "../../utils/formatarUtil";
+import { aplicarMascara } from "../../utils/util";
 
 const CampoTexto = ({
   handleChange = () => {},
@@ -22,6 +22,7 @@ const CampoTexto = ({
   margin = "normal",
   defaultValue,
   startAdornment = null,
+  endAdornment,
   inputRef,
   handleErros = () => {},
 }) => {
@@ -97,6 +98,10 @@ const CampoTexto = ({
           input: {
             startAdornment: startAdornment ? (
               <InputAdornment position="start">{startAdornment}</InputAdornment>
+            ) : null,
+
+            endAdornment: endAdornment ? (
+              <InputAdornment position="end">{endAdornment}</InputAdornment>
             ) : null,
             style: style,
           },
