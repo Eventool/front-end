@@ -42,6 +42,9 @@ import { useCollapsed } from "../context/CollapsedContext";
 import Cadastro from "../pages/Cadastro";
 import RegistroDemanda from "../pages/demandas/RegistroDemanda";
 import RegistroFormulario from "../pages/formulario/RegistroFormulario";
+import RegistroConvite from "../pages/colaborador/RegistroConvite";
+import CheckIn from "../pages/CheckIn";
+import ConfirmarAgendamento from "../pages/ConfirmarAgendamento";
 
 const Layout = () => {
   // const [collapsed, setCollapsed] = useState(
@@ -202,6 +205,21 @@ const Layout = () => {
                   }
                 />
                 <Route
+                  path="/check-in"
+                  element={
+                    <CheckIn setTitulo={setTitulo} setActions={setActions} />
+                  }
+                />
+                <Route
+                  path="/check-in/:agendamentoId"
+                  element={
+                    <ConfirmarAgendamento
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
+                  }
+                />
+                <Route
                   path="/eventos/:recordId"
                   element={
                     <RegistroEvento
@@ -327,6 +345,18 @@ const Layout = () => {
                   path="/convites"
                   element={
                     <Convites setTitulo={setTitulo} setActions={setActions} />
+                  }
+                />
+                <Route
+                  path="/convites/:recordId"
+                  element={
+                    <RegistroConvite
+                      toggleDialog={toggleDialog}
+                      setDialogAction={setDialogAction}
+                      setDialogContent={setDialogContent}
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
                   }
                 />
               </Route>

@@ -150,7 +150,7 @@ export const getNestedValue = (obj, path) => {
 }
 
 export const updateNestedState = (obj, path, value) => {
-  console.log(path)
+  //console.log(path)
   const keys = path.split('.');
   const updatedObject = { ...obj };
   let currentLevel = updatedObject;
@@ -166,3 +166,10 @@ export const updateNestedState = (obj, path, value) => {
   currentLevel[keys[keys.length - 1]] = value;
   return updatedObject;
 };
+
+export const formatCurrency = (value) => {
+  return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+  }).format(value);
+}

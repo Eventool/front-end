@@ -16,12 +16,13 @@ import CustomSubMenu from "./items/SubMenu";
 import HomeIcon from "@mui/icons-material/Home";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import MailIcon from "@mui/icons-material/Mail";
+import MailIcon from "@mui/icons-material/MailOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { useUser } from "../../context/UserContext";
 import { useCollapsed } from "../../context/CollapsedContext";
 import { useLocation } from "react-router-dom";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 
 const BarraLateral = () => {
   const theme = useTheme();
@@ -104,6 +105,13 @@ const BarraLateral = () => {
               icon={<AssignmentOutlinedIcon />}
               text="Demandas"
             />
+            <Item
+              active={location.pathname === "/check-in"}
+              smallText={false}
+              linkTo="/check-in"
+              icon={<QrCodeIcon />}
+              text="Check in"
+            />
             {/* <Item
                 active={location.pathname === "/demandas-abertas"}
                 theme={theme.palette.primary.lighter}
@@ -146,10 +154,10 @@ const BarraLateral = () => {
               active={location.pathname === "/eventos-confirmados"}
               theme={theme.palette.primary.lighter}
               linkTo="/eventos-confirmados"
-              icon={<CheckBoxOutlinedIcon />}
-              text="Eventos confirmados"
+              icon={<CelebrationOutlinedIcon />}
+              text="Eventos"
             />
-            <Item
+            {/* <Item
               active={location.pathname === "/eventos-pendentes"}
               theme={theme.palette.primary.lighter}
               linkTo="/eventos-pendentes"
@@ -162,7 +170,7 @@ const BarraLateral = () => {
               linkTo="/eventos/buscar"
               icon={<SearchIcon />}
               text="Buscar"
-            />
+            /> */}
             <Item
               active={location.pathname === "/convites"}
               theme={theme.palette.primary.lighter}

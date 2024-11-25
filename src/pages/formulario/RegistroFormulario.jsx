@@ -17,7 +17,7 @@ const RegistroFormulario = ({
   const { recordId } = useParams();
 
   useEffect(() => {
-    console.log(recordId);
+    //console.log(recordId);
   }, [recordId]);
 
   return <PageModal></PageModal>;
