@@ -77,6 +77,47 @@ export const putData = async (resource, request, id) => {
   }
 };
 
+export const patchData = async (resource, id, action) => {
+  try {
+    const response = await axios.patch(`${urlData}${resource}/${id}/${action}`, {}, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+      },
+    });
+
+
+    return response.data;
+  } catch (err) {
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
+  }
+};
+
+export const patchParamsData = async (resource, params) => {
+  try {
+    const response = await axios.patch(`${urlData}${resource}`, {}, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+      },
+      params: params
+    });
+
+
+    return response.data;
+  } catch (err) {
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
+  }
+};
+
 export const deleteData = async (resource, id) => {
   try {
     const response = await axios.delete(`${urlData}${resource}/${id}`, {

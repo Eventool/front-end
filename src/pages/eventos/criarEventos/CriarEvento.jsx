@@ -97,7 +97,6 @@ const CriarEvento = ({ setTitulo, setActions }) => {
   const [podeAvancar, setAvancar] = useState(false);
 
   const handleErros = (e) => {
-    //console.log(erros);
     setErros((prevState) => ({
       ...prevState,
       [e.name]: e.value,
@@ -258,6 +257,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
                 dadosEvento={dadosEvento}
                 handleEnderecoChange={handleEnderecoChange}
                 handleUfChange={handleUfChange}
+                handleErros={handleErros}
               />
             )}
 

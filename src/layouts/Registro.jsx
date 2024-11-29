@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageModal from "../components/pageModal/PageModal";
 import Imagem from "../components/imagem/Imagem";
 import { deleteData, fetchData, putData } from "../services/DataService";
@@ -60,7 +60,7 @@ const Registro = ({
   const [podeAvancar, setAvancar] = useState(false);
 
   const handleErros = (e) => {
-    console.log(erros);
+    //console.log(erros);
     setErros((prevState) => ({
       ...prevState,
       [e.name]: e.value,
@@ -163,22 +163,23 @@ const Registro = ({
       title: "Deseja excluir?",
       body: (
         <>
-          O objeto <b>{objeto.nome}</b> será excluido permanentemente
+          O {struct.object.value} <b>{objeto.nome}</b> será excluido
+          permanentemente
         </>
       ),
     });
 
     setDialogAction(() => async () => {
-      const { status } = await deleteData(objeto.id);
+      const response = await deleteData(struct.object.resource, objeto.id);
 
-      if (status !== 204) {
-        alerta.error("Erro ao excluir objeto", "error");
+      if (response.error) {
+        alerta.error("Erro ao excluir " + struct.object.name, "error");
         return;
       }
 
-      alerta.success("Objeto excluido com sucesso");
+      alerta.success(struct.object.name + " excluído com sucesso");
 
-      navigate("/", struct.object.resource);
+      navigate("/" + struct.object.resource);
     });
 
     toggleDialog();
@@ -227,7 +228,7 @@ const Registro = ({
             sx={(theme) => ({
               position: "sticky",
               top: -16,
-              zIndex: theme.zIndex.drawer + 1,
+              zIndex: theme.zIndex.drawer - 1,
               bgcolor: "#ffffff",
             })}
           >
@@ -298,32 +299,53 @@ const Registro = ({
                 })}
               </Box>
               <Box className="flexRowCenter" gap={1}>
-                <Button
-                  disabled={editando}
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<EditIcon />}
-                  onClick={handleEditarObjeto}
-                >
-                  Editar
-                </Button>
-                <Button
-                  disabled={editando}
-                  variant="outlined"
-                  startIcon={<DeleteIcon />}
-                  onClick={handleDeletar}
-                >
-                  Excluir
-                </Button>
+                {!struct.object.readOnly && (
+                  <>
+                    <Button
+                      disabled={editando}
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<EditIcon />}
+                      onClick={handleEditarObjeto}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      disabled={editando}
+                      variant="outlined"
+                      startIcon={<DeleteIcon />}
+                      onClick={handleDeletar}
+                    >
+                      Excluir
+                    </Button>
+                  </>
+                )}
+                {struct.headerActions && (
+                  <>
+                    {struct.headerActions.map((item, index) => {
+                      return (
+                        <Button
+                          variant={item.variant}
+                          color={item.color}
+                          onClick={() => item.action(objeto)}
+                          startIcon={item.icon}
+                          key={index}
+                        >
+                          {item.label}
+                        </Button>
+                      );
+                    })}
+                  </>
+                )}
               </Box>
             </Box>
             <Divider />
           </Box>
-          {struct.image && (
+          {struct.body?.image && (
             <Box className="flexRowBetween">
               <Imagem
                 imagem={objetoEditado.imagem}
-                placeholder={struct.image.placeholder}
+                placeholder={struct.body.image.placeholder}
               />
             </Box>
           )}
@@ -512,6 +534,10 @@ const Registro = ({
                             </Grid>
                           </>
                         );
+
+                      if (section.customContent) {
+                        return section.customContent(objeto);
+                      }
                     });
                   })}
                 </Grid>
@@ -592,7 +618,11 @@ const Guias = ({ guias, guiaAtual, setGuia, guiaActions, objeto }) => {
 
             return (
               item.id === guiaAtual && (
-                <Button startIcon={item.icon} key={index} onClick={action}>
+                <Button
+                  startIcon={item.icon}
+                  key={index}
+                  onClick={() => action(objeto)}
+                >
                   {item.label}
                 </Button>
               )

@@ -3,12 +3,14 @@ import Grid from "@mui/material/Grid2";
 import CampoTexto from "../../../components/input/CampoTexto";
 import axios from "axios";
 import { estados } from "../../../utils/dataMockUtil";
+import { useEffect, useRef } from "react";
 
 const EventoEndereco = ({
   handleEnderecoChange,
   handleUfChange,
   dadosEvento,
   handleViaCEPResponse,
+  handleErros,
 }) => {
   const handleViaCEP = async (e, name) => {
     handleEnderecoChange(e, name);
@@ -30,6 +32,12 @@ const EventoEndereco = ({
     handleViaCEPResponse(enderecoChange);
   };
 
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <>
       <Grid
@@ -46,15 +54,27 @@ const EventoEndereco = ({
       </Grid>
       <Grid width="80%" margin="auto" container columnSpacing={2}>
         <CampoTexto
+          required
+          size={12}
+          handleChange={handleEnderecoChange}
+          value={dadosEvento.endereco?.local}
+          handleErros={handleErros}
+          name="local"
+          label="Local"
+          inputRef={inputRef}
+        />
+        <CampoTexto
           size={12}
           handleChange={handleEnderecoChange}
           value={dadosEvento.endereco?.logradouro}
+          handleErros={handleErros}
           name="logradouro"
           label="Logradouro"
         />
         <CampoTexto
           handleChange={handleViaCEP}
           value={dadosEvento.endereco?.cep}
+          handleErros={handleErros}
           name="cep"
           mascara="cep"
           regex={/^\d{5}-\d{3}$/}
@@ -63,6 +83,7 @@ const EventoEndereco = ({
         <CampoTexto
           handleChange={handleEnderecoChange}
           value={dadosEvento.endereco?.numero}
+          handleErros={handleErros}
           mascara="numeroPositivo"
           name="numero"
           textSize={{ min: 0, max: 12 }}
@@ -71,6 +92,7 @@ const EventoEndereco = ({
         <CampoTexto
           handleChange={handleEnderecoChange}
           value={dadosEvento.endereco?.cidade}
+          handleErros={handleErros}
           name="cidade"
           label="Cidade"
         />

@@ -201,7 +201,9 @@ const RegistroEvento = ({
       ],
     },
     body: {
-      image: {},
+      image: {
+        placeholder: null,
+      },
     },
     tabs: [
       {
@@ -325,9 +327,6 @@ const RegistroEvento = ({
         action: "/demandas/criar?eventId=",
       },
     ],
-    image: {
-      placeholder: img,
-    },
   };
 
   return (

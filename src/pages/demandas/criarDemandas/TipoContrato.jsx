@@ -10,7 +10,12 @@ import Picklist from "../../../components/input/Picklist";
 import { documentos, tiposContrato } from "../../../utils/dataMockUtil";
 import { useEffect, useState } from "react";
 
-const TipoContrato = ({ dadosDemanda, handleDadosChange }) => {
+const TipoContrato = ({
+  dadosDemanda,
+  handleDadosChange,
+  handleErros,
+  erros,
+}) => {
   const handleDocumentoChange = (e, name) => {
     const documento = tiposContrato.find(
       (contrato) => contrato.id === e.target.value
@@ -52,6 +57,8 @@ const TipoContrato = ({ dadosDemanda, handleDadosChange }) => {
             value={dadosDemanda.tipoContrato.id}
             handleChange={handleDocumentoChange}
             items={tiposContrato}
+            required
+            handleErros={handleErros}
           />
         </Grid>
         <FormGroup>

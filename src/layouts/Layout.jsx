@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import {
+  BottomNavigation,
+  BottomNavigationAction,
   Box,
   Button,
   ButtonGroup,
   CssBaseline,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import {
   BrowserRouter as Router,
@@ -41,8 +44,11 @@ import Configuracoes from "../pages/Configuracoes";
 import { useCollapsed } from "../context/CollapsedContext";
 import RegistroDemanda from "../pages/demandas/RegistroDemanda";
 import RegistroFormulario from "../pages/formulario/RegistroFormulario";
-import PaginaUsuario from "../pages/PáginaUsuario";
-import Cadastro from "../pages/Cadastro";
+import RegistroConvite from "../pages/colaborador/RegistroConvite";
+import CheckIn from "../pages/CheckIn";
+import ConfirmarAgendamento from "../pages/ConfirmarAgendamento";
+import BottomNav from "../components/bottomNav/BottomNav";
+import { useTheme } from "@emotion/react";
 
 const Layout = () => {
   // const [collapsed, setCollapsed] = useState(
@@ -69,6 +75,8 @@ const Layout = () => {
   };
 
   const { collapsed } = useCollapsed();
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
     <>
@@ -84,7 +92,8 @@ const Layout = () => {
           location.pathname !== "/cadastro" && <Navbar />}
         <div className="app">
           {location.pathname !== "/login" &&
-            location.pathname !== "/cadastro" && <BarraLateral />}
+            location.pathname !== "/cadastro" &&
+            !mobile && <BarraLateral />}
           <Box
             sx={{
               overflow:
@@ -101,6 +110,7 @@ const Layout = () => {
             }
             style={{
               left: `${
+                !mobile &&
                 location.pathname !== "/login" &&
                 location.pathname !== "/cadastro"
                   ? collapsed
@@ -109,6 +119,7 @@ const Layout = () => {
                   : 0
               }px`,
               width: `calc(100% - ${
+                !mobile &&
                 location.pathname !== "/login" &&
                 location.pathname !== "/cadastro"
                   ? collapsed
@@ -200,6 +211,21 @@ const Layout = () => {
                   path="/eventos"
                   element={
                     <Eventos setTitulo={setTitulo} setActions={setActions} />
+                  }
+                />
+                <Route
+                  path="/check-in"
+                  element={
+                    <CheckIn setTitulo={setTitulo} setActions={setActions} />
+                  }
+                />
+                <Route
+                  path="/check-in/:agendamentoId"
+                  element={
+                    <ConfirmarAgendamento
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
                   }
                 />
                 <Route
@@ -342,10 +368,23 @@ const Layout = () => {
                     <Convites setTitulo={setTitulo} setActions={setActions} />
                   }
                 />
+                <Route
+                  path="/convites/:recordId"
+                  element={
+                    <RegistroConvite
+                      toggleDialog={toggleDialog}
+                      setDialogAction={setDialogAction}
+                      setDialogContent={setDialogContent}
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
+                  }
+                />
               </Route>
             </Routes>
           </Box>
         </div>
+        {mobile && <BottomNav />}
       </Box>
     </>
   );

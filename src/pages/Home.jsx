@@ -16,6 +16,8 @@ import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import MailIcon from "@mui/icons-material/MailOutlined";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 
 const Home = ({ setTitulo, setActions }) => {
   useEffect(() => {
@@ -25,7 +27,7 @@ const Home = ({ setTitulo, setActions }) => {
 
   const iconStyle = { color: "secondary", fontSize: "large" };
 
-  const homeItems = [
+  const homeItemsParceiro = [
     {
       label: "Dashboard",
       icon: <DashboardOutlinedIcon {...iconStyle} />,
@@ -47,14 +49,26 @@ const Home = ({ setTitulo, setActions }) => {
       linkTo: "/parceiros",
     },
     {
-      label: "Calendário",
-      icon: <CalendarMonthOutlinedIcon {...iconStyle} />,
-      linkTo: "/calendario",
+      label: "Check-in",
+      icon: <QrCodeIcon {...iconStyle} />,
+      linkTo: "/check-in",
     },
     {
       label: "Formulários",
       icon: <DescriptionOutlinedIcon {...iconStyle} />,
       linkTo: "/formularios",
+    },
+  ];
+  const homeItemsColaborador = [
+    {
+      label: "Eventos",
+      icon: <CelebrationOutlinedIcon {...iconStyle} />,
+      linkTo: "/eventos-confirmados",
+    },
+    {
+      label: "Convites",
+      icon: <MailIcon {...iconStyle} />,
+      linkTo: "/convites",
     },
   ];
 
@@ -76,9 +90,15 @@ const Home = ({ setTitulo, setActions }) => {
         gap={4}
         flexWrap="wrap"
       >
-        {homeItems.map((item, index) => {
-          return <HomeCard key={index} {...item} />;
-        })}
+        {sessionStorage.tipoUsuario === "parceiro" &&
+          homeItemsParceiro.map((item, index) => {
+            return <HomeCard key={index} {...item} />;
+          })}
+
+        {sessionStorage.tipoUsuario === "colaborador" &&
+          homeItemsColaborador.map((item, index) => {
+            return <HomeCard key={index} {...item} />;
+          })}
       </Box>
     </Box>
   );
