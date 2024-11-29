@@ -39,9 +39,10 @@ import Convites from "../pages/colaborador/Convites";
 import BuscarEventos from "../pages/colaborador/BuscarEventos";
 import Configuracoes from "../pages/Configuracoes";
 import { useCollapsed } from "../context/CollapsedContext";
-import Cadastro from "../pages/Cadastro";
 import RegistroDemanda from "../pages/demandas/RegistroDemanda";
 import RegistroFormulario from "../pages/formulario/RegistroFormulario";
+import PaginaUsuario from "../pages/PáginaUsuario";
+import Cadastro from "../pages/Cadastro";
 
 const Layout = () => {
   // const [collapsed, setCollapsed] = useState(
@@ -154,7 +155,7 @@ const Layout = () => {
                   <Login setTitulo={setTitulo} setActions={setActions} />
                 }
               />
-              <Route
+             <Route
                 path="/cadastro"
                 element={
                   <Cadastro setTitulo={setTitulo} setActions={setActions} />
@@ -217,6 +218,18 @@ const Layout = () => {
                   path="/demandas/:recordId"
                   element={
                     <RegistroDemanda
+                      toggleDialog={toggleDialog}
+                      setDialogAction={setDialogAction}
+                      setDialogContent={setDialogContent}
+                      setTitulo={setTitulo}
+                      setActions={setActions}
+                    />
+                  }
+                />
+                <Route
+                  path="/usuarios/:userId"
+                  element={
+                    <PaginaUsuario
                       toggleDialog={toggleDialog}
                       setDialogAction={setDialogAction}
                       setDialogContent={setDialogContent}

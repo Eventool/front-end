@@ -106,10 +106,9 @@ const CardUsuario = (usuario) => {
               {user.email}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {user.contato.celular.replace(
-                /(\d{2})(\d{5})(\d{4})/,
-                "($1) $2-$3"
-              )}
+            {user?.contato?.celular
+            ? user.contato.celular.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")
+            : "Número indisponível"}
             </Typography>
             <Stack mt={2}>
               <Rating defaultValue={4} precision={0.5} readOnly />
