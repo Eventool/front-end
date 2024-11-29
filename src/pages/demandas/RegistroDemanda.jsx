@@ -318,7 +318,9 @@ const RegistroDemanda = ({
     })();
   }, [open, recordId]);
 
-  const handleClose = () => {
+  const handleClose = (event, reason) => {
+    if (reason && reason === "backdropClick") return;
+
     setSelectedUsers([]);
     setSelectedEscala({ id: "", value: "" });
     setOpen(false);
