@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import {
+  BottomNavigation,
+  BottomNavigationAction,
   Box,
   Button,
   ButtonGroup,
   CssBaseline,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import {
   BrowserRouter as Router,
@@ -45,6 +48,8 @@ import RegistroFormulario from "../pages/formulario/RegistroFormulario";
 import RegistroConvite from "../pages/colaborador/RegistroConvite";
 import CheckIn from "../pages/CheckIn";
 import ConfirmarAgendamento from "../pages/ConfirmarAgendamento";
+import BottomNav from "../components/bottomNav/BottomNav";
+import { useTheme } from "@emotion/react";
 
 const Layout = () => {
   // const [collapsed, setCollapsed] = useState(
@@ -71,6 +76,8 @@ const Layout = () => {
   };
 
   const { collapsed } = useCollapsed();
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
     <>
@@ -86,7 +93,8 @@ const Layout = () => {
           location.pathname !== "/cadastro" && <Navbar />}
         <div className="app">
           {location.pathname !== "/login" &&
-            location.pathname !== "/cadastro" && <BarraLateral />}
+            location.pathname !== "/cadastro" &&
+            !mobile && <BarraLateral />}
           <Box
             sx={{
               overflow:
@@ -103,6 +111,7 @@ const Layout = () => {
             }
             style={{
               left: `${
+                !mobile &&
                 location.pathname !== "/login" &&
                 location.pathname !== "/cadastro"
                   ? collapsed
@@ -111,6 +120,7 @@ const Layout = () => {
                   : 0
               }px`,
               width: `calc(100% - ${
+                !mobile &&
                 location.pathname !== "/login" &&
                 location.pathname !== "/cadastro"
                   ? collapsed
@@ -363,6 +373,7 @@ const Layout = () => {
             </Routes>
           </Box>
         </div>
+        {mobile && <BottomNav />}
       </Box>
     </>
   );

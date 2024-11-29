@@ -228,7 +228,7 @@ const Registro = ({
             sx={(theme) => ({
               position: "sticky",
               top: -16,
-              zIndex: theme.zIndex.drawer + 1,
+              zIndex: theme.zIndex.drawer - 1,
               bgcolor: "#ffffff",
             })}
           >
@@ -322,8 +322,18 @@ const Registro = ({
                 )}
                 {struct.headerActions && (
                   <>
-                    {struct.headerActions.map((item) => {
-                      return item;
+                    {struct.headerActions.map((item, index) => {
+                      return (
+                        <Button
+                          variant={item.variant}
+                          color={item.color}
+                          onClick={() => item.action(objeto)}
+                          startIcon={item.icon}
+                          key={index}
+                        >
+                          {item.label}
+                        </Button>
+                      );
                     })}
                   </>
                 )}

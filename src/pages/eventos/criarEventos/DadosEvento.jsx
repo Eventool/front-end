@@ -86,20 +86,20 @@ const DadosEvento = ({
         <DataHora
           handleChange={(e) => handleTimeChange(e, "inicio")}
           value={dadosEvento.inicio != "" ? dayjs(dadosEvento.inicio) : null}
-          handleErros={handleErros}
           name="inicio"
           label="Início"
           erros={erros}
+          handleErros={handleErros}
           errorMsg="O início não pode ser anterior ao presente."
         />
         <DataHora
           handleChange={(e) => handleTimeChange(e, "fim")}
           value={dadosEvento.fim != "" ? dayjs(dadosEvento.fim) : null}
           minDateTime={dayjs(dadosEvento.inicio)}
-          handleErros={handleErros}
           name="fim"
           label="Fim"
           erros={erros}
+          handleErros={handleErros}
           errorMsg="O fim não pode ser anterior ao início."
         />
         <CampoTexto

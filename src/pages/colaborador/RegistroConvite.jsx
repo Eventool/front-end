@@ -1,14 +1,24 @@
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import Registro from "../../layouts/Registro";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BlockIcon from "@mui/icons-material/Block";
 import ClearIcon from "@mui/icons-material/Clear";
 import html2canvas from "html2canvas";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import logo from "/logo.png";
 import dayjs from "dayjs";
 import QrCodeIcon from "@mui/icons-material/QrCode";
 import { numToMes } from "../../utils/util";
+import DownloadIcon from "@mui/icons-material/Download";
+import { useTheme } from "@emotion/react";
 
 const RegistroConvite = ({
   setTitulo,
@@ -19,18 +29,25 @@ const RegistroConvite = ({
 }) => {
   const captureRef = useRef(null);
 
-  const handleSalvar = async (objeto) => {
-    console.log(objeto);
+  const [convite, setConvite] = useState({});
+  const [open, setOpen] = useState(false);
+
+  const handleSalvar = async () => {
     if (!captureRef.current) return;
     const canvas = await html2canvas(captureRef.current, { scale: 3 });
 
     const imgData = canvas.toDataURL("image/jpeg", 1.0);
     const link = document.createElement("a");
     link.href = imgData;
-    link.download = `${objeto.nome}_${objeto.funcao}_${dayjs(
-      objeto.horarioEntrada
+    link.download = `${convite.nome}_${convite.funcao}_${dayjs(
+      convite.horarioEntrada
     ).format("HH-mm")}_convite.jpg`;
     link.click();
+  };
+
+  const handleAbrirConvite = (objeto) => {
+    setConvite(objeto);
+    setOpen(true);
   };
 
   const struct = {
@@ -70,14 +87,20 @@ const RegistroConvite = ({
       ],
     },
     headerActions: [
-      <Button
-        variant="contained"
-        color="error"
-        startIcon={<ClearIcon />}
-        key="0"
-      >
-        Cancelar
-      </Button>,
+      {
+        label: "Cancelar",
+        icon: <ClearIcon />,
+        variant: "outlined",
+        color: "error",
+        action: (objeto) => console.log(objeto),
+      },
+      {
+        label: "Check-in",
+        icon: <QrCodeIcon />,
+        variant: "contained",
+        color: "secondary",
+        action: (objeto) => handleAbrirConvite(objeto),
+      },
     ],
 
     body: {
@@ -179,29 +202,32 @@ const RegistroConvite = ({
           },
         ],
       },
-      {
-        name: "Entrada",
-        sections: [
-          {
-            customContent: (convite) => (
-              <ConviteEntrada convite={convite} captureRef={captureRef} />
-            ),
-          },
-        ],
-      },
-    ],
-    tabsAction: [
-      {
-        id: "Entrada",
-        label: "Baixar",
-        icon: <QrCodeIcon />,
-        type: "function",
-        action: (objeto) => handleSalvar(objeto),
-      },
     ],
   };
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <>
+      <Dialog fullScreen={fullScreen} open={open} onClose={handleClose}>
+        <DialogContent>
+          <ConviteEntrada captureRef={captureRef} convite={convite} />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<DownloadIcon />}
+            onClick={handleSalvar}
+          >
+            Baixar
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Registro
         setTitulo={setTitulo}
         setActions={setActions}
@@ -252,7 +278,7 @@ const CamposEntrada = ({ convite }) => {
   return (
     <>
       <img
-        width="250px"
+        width="80%"
         src={`data:image/png;base64,${convite.codigo.imagemQRCode}`}
       />
       <Box>

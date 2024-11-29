@@ -40,7 +40,7 @@ const BarraLateral = () => {
           color: "white",
           width: collapsed ? "80px" : "260px",
           transition: "300ms",
-          zIndex: 1000,
+          zIndex: theme.zIndex.drawer,
         },
       }}
     >

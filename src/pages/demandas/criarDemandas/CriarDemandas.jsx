@@ -152,6 +152,29 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
     }));
   }, [eventId, eventos]);
 
+  const [erros, setErros] = useState([]);
+  const [podeAvancar, setAvancar] = useState(true);
+
+  const handleErros = (e) => {
+    setErros((prevState) => ({
+      ...prevState,
+      [e.name]: e.value,
+    }));
+  };
+
+  useEffect(() => {
+    setAvancar(() => {
+      const campos = Object.keys(erros);
+      for (let i = 0; i < campos.length; i++) {
+        if (erros[campos[i]]) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }, [erros]);
+
   return (
     <>
       <PageModal>
@@ -165,6 +188,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
             </Grid>
             {step === 0 && (
               <DadosDemanda
+                handleErros={handleErros}
+                erros={erros}
                 responsaveis={responsaveis}
                 eventos={eventos}
                 hasParams={eventId != null}
@@ -179,6 +204,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
                 setDadosDemanda={setDadosDemanda}
                 dadosDemanda={dadosDemanda}
                 adicionarEscala={adicionarEscala}
+                handleErros={handleErros}
+                erros={erros}
               />
             )}
 
@@ -186,6 +213,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
               <TipoContrato
                 dadosDemanda={dadosDemanda}
                 handleDadosChange={handleDadosChange}
+                handleErros={handleErros}
+                erros={erros}
               />
             )}
 
@@ -216,6 +245,7 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
           <Botao
             onClick={handleProximo}
             sx={{ width: "100%", minWidth: 100 }}
+            disabled={!!podeAvancar}
             txt={step < qtdSteps - 1 ? "Próximo" : "Criar Demanda"}
           />
         </Box>

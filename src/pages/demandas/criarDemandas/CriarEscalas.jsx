@@ -5,13 +5,26 @@ import CampoTexto from "../../../components/input/CampoTexto";
 import Botao from "../../../components/btn/Botao";
 import PillContainer from "../../../components/pill/Pill";
 import { funcoesAlocacao } from "../../../utils/dataMockUtil";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OutlinedBox from "../../../components/box/OutlinedBox";
 
-const CriarEscalas = ({ dadosDemanda, setDadosDemanda, adicionarEscala }) => {
+const CriarEscalas = ({
+  dadosDemanda,
+  setDadosDemanda,
+  adicionarEscala,
+  handleErros,
+  erros,
+}) => {
   const setEscalas = (escala) => {
     setDadosDemanda({ ...dadosDemanda, escalas: escala });
   };
+
+  useEffect(() => {
+    handleErros({
+      name: "escalas",
+      value: dadosDemanda.escalas?.length === 0,
+    });
+  }, [dadosDemanda]);
 
   const [escalaAtual, setEscalaAtual] = useState({
     funcao: {
@@ -52,15 +65,20 @@ const CriarEscalas = ({ dadosDemanda, setDadosDemanda, adicionarEscala }) => {
     adicionarEscala(novaEscala);
 
     setEscalaAtual({
-      funcao: {
-        id: "",
-        value: "",
-      },
+      funcao: {},
       qtdColaborador: "",
       horasJornada: "",
       valor: "",
     });
   };
+
+  const [podeAvancar, setAvancar] = useState(true);
+
+  useEffect(() => {
+    const { funcao, qtdColaborador, horasJornada, valor } = escalaAtual;
+
+    setAvancar(!funcao.value || !qtdColaborador || !horasJornada || !valor);
+  }, [escalaAtual]);
 
   return (
     <>
@@ -122,6 +140,7 @@ const CriarEscalas = ({ dadosDemanda, setDadosDemanda, adicionarEscala }) => {
             sx={{ mt: 2 }}
             txt="Inserir Escala"
             onClick={cadastrarEscala}
+            disabled={!!podeAvancar}
           />
         </FormControl>
       </Grid>

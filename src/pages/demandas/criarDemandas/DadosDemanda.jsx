@@ -4,6 +4,7 @@ import CampoTexto from "../../../components/input/CampoTexto";
 import DataHora from "../../../components/input/DataHora";
 import Picklist from "../../../components/input/Picklist";
 import dayjs from "dayjs";
+import { useEffect, useRef } from "react";
 
 const DadosDemanda = ({
   responsaveis,
@@ -12,6 +13,8 @@ const DadosDemanda = ({
   dadosDemanda,
   setDadosDemanda,
   hasParams,
+  handleErros,
+  erros,
 }) => {
   const handleTimeChange = (e, name) => {
     setDadosDemanda({
@@ -30,6 +33,12 @@ const DadosDemanda = ({
     handleDadosChange(e, name);
   };
 
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <>
       <Grid
@@ -46,25 +55,35 @@ const DadosDemanda = ({
       </Grid>
       <Grid width="80%" margin="auto" container columnSpacing={2}>
         <CampoTexto
+          required
           size={12}
           handleChange={handleDadosChange}
           value={dadosDemanda.nome}
           name="nome"
           label="Nome"
+          handleErros={handleErros}
+          inputRef={inputRef}
         />
         <DataHora
           handleChange={(e) => handleTimeChange(e, "inicio")}
           value={dadosDemanda.inicio != "" ? dayjs(dadosDemanda.inicio) : null}
           name="inicio"
           label="Início"
+          erros={erros}
+          handleErros={handleErros}
+          errorMsg="O início não pode ser anterior ao presente."
         />
         <DataHora
           handleChange={(e) => handleTimeChange(e, "fim")}
           value={dadosDemanda.fim != "" ? dayjs(dadosDemanda.fim) : null}
           name="fim"
           label="Fim"
+          erros={erros}
+          handleErros={handleErros}
+          errorMsg="O fim não pode ser anterior ao início."
         />
         <Picklist
+          required
           itemParam="nome"
           disabled={hasParams}
           items={eventos}
@@ -74,10 +93,12 @@ const DadosDemanda = ({
           value={dadosDemanda.evento?.id}
         />
         <Picklist
+          required
           itemParam="nome"
           items={responsaveis}
           name="responsavel"
           label={"Coordenador"}
+          handleErros={handleErros}
           handleChange={handleResponsavelChange}
           value={dadosDemanda.responsavel?.id}
         />
