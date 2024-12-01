@@ -50,7 +50,7 @@ import ConfirmarAgendamento from "../pages/ConfirmarAgendamento";
 import BottomNav from "../components/bottomNav/BottomNav";
 import { useTheme } from "@emotion/react";
 import Cadastro from "../pages/Cadastro";
-import PaginaUsuario from "../pages/PáginaUsuario";
+import PaginaUsuario from "../pages/PaginaUsuario";
 
 const Layout = () => {
   // const [collapsed, setCollapsed] = useState(

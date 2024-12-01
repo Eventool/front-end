@@ -14,6 +14,8 @@ import Grid from "@mui/material/Grid2";
 import MudarVisualizacao from "../components/mudarVisualizacao/MudarVisualizacao";
 import { fetchData } from "../services/DataService";
 import { useAlerta } from "../context/AlertaContext";
+import { useNavigate } from "react-router-dom";
+
 import dayjs from "dayjs";
 
 const Parceiros = ({ setTitulo, setActions }) => {
@@ -23,6 +25,7 @@ const Parceiros = ({ setTitulo, setActions }) => {
   }, []);
 
   const alerta = useAlerta();
+
 
   const [usuarios, setUsuarios] = useState([]);
   const [usuariosData, setUsuariosData] = useState([]);
@@ -82,6 +85,7 @@ const Parceiros = ({ setTitulo, setActions }) => {
 
 const CardUsuario = (usuario) => {
   const user = usuario.usuario;
+  const navigate = useNavigate();
 
   return (
     <Card>
@@ -91,7 +95,7 @@ const CardUsuario = (usuario) => {
           height={140}
           image="https://via.placeholder.com/150"
         />
-        <CardContent>
+        <CardContent onClick={() => navigate("/usuarios/" + user.id)}>
           <Box
             className="flexColumn"
             sx={{ alignItems: "center", justifyContent: "center" }}
