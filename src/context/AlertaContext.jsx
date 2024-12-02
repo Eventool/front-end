@@ -13,13 +13,18 @@ export function AlertaProvider({ children }) {
   const [alertaLabel, setAlertaLabel] = useState("");
   const [alertaSeverity, setAlertaSeverity] = useState("");
   const [alertaIcon, setAlertaIcon] = useState(null);
+  const [alertaUndoCallback, setAlertaUndoCallback] = useState(null);
 
-  const showAlerta = useCallback((label, severity, icon) => {
-    setAlertaLabel(label);
-    setAlertaIcon(icon);
-    setAlertaSeverity(severity);
-    setAlertaOpen(true);
-  }, []);
+  const showAlerta = useCallback(
+    (label, severity, icon, undoCallback = null) => {
+      setAlertaLabel(label);
+      setAlertaIcon(icon);
+      setAlertaSeverity(severity);
+      setAlertaUndoCallback(() => undoCallback);
+      setAlertaOpen(true);
+    },
+    []
+  );
 
   const success = useCallback(
     (label) => {
@@ -49,14 +54,22 @@ export function AlertaProvider({ children }) {
     [showAlerta]
   );
 
+  const undo = useCallback(
+    (label, undoCallback) => {
+      showAlerta(label, "success", <CheckIcon />, undoCallback);
+    },
+    [showAlerta]
+  );
+
   return (
-    <AlertaContext.Provider value={{ success, error, info, warning }}>
+    <AlertaContext.Provider value={{ success, error, info, warning, undo }}>
       <Alerta
         setAlertaOpen={setAlertaOpen}
         severity={alertaSeverity}
         open={alertaOpen}
         label={alertaLabel}
         icon={alertaIcon}
+        undoCallback={alertaUndoCallback}
       />
       {children}
     </AlertaContext.Provider>

@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, Button } from "@mui/material";
 
 const Alerta = ({
   label,
@@ -7,6 +7,7 @@ const Alerta = ({
   variant = "filled",
   open,
   setAlertaOpen,
+  undoCallback = null, // Add optional undo callback
 }) => {
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -14,6 +15,11 @@ const Alerta = ({
     }
 
     setAlertaOpen(false);
+  };
+
+  const handleUndo = () => {
+    if (undoCallback) undoCallback(); // Execute undo callback if provided
+    setAlertaOpen(false); // Close the alert
   };
 
   return (
@@ -27,7 +33,14 @@ const Alerta = ({
         icon={icon}
         severity={severity}
         variant={variant}
-        onClose={() => setAlertaOpen(false)}
+        action={
+          undoCallback && (
+            <Button color="inherit" size="small" onClick={handleUndo}>
+              Desfazer
+            </Button>
+          )
+        }
+        onClose={handleClose}
       >
         {label}
       </Alert>

@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import PageModal from "../components/pageModal/PageModal";
 import Imagem from "../components/imagem/Imagem";
-import { deleteData, fetchData, putData } from "../services/DataService";
+import {
+  deleteData,
+  fetchData,
+  postData,
+  putData,
+} from "../services/DataService";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import {
@@ -173,7 +178,20 @@ const Registro = ({
         return;
       }
 
-      alerta.success(struct.object.name + " excluído com sucesso");
+      alerta.undo(struct.object.name + " excluído com sucesso", async () => {
+        const response = await postData(
+          struct.object.resource + "/restaurar",
+          {}
+        );
+
+        if (response.error) {
+          alerta.error("Não foi possível restaurar ", struct.object.name);
+          return;
+        }
+
+        alerta.success(struct.object.name + " restaurado com sucesso");
+        navigate("/" + struct.object.resource + "/" + response.id);
+      });
 
       navigate("/" + struct.object.resource);
     });
