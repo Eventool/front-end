@@ -4,12 +4,12 @@ import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid2";
 
-const CampoSugestao = ({ options, onChange }) => {
+const CampoSugestao = ({ options, onChange, multiple = true }) => {
   return (
     <Grid size={12}>
       <Autocomplete
-        disableCloseOnSelect
-        multiple
+        disableCloseOnSelect={multiple}
+        multiple={multiple}
         options={options}
         onChange={onChange}
         getOptionLabel={(option) => `${option.name} (${option.email})`}

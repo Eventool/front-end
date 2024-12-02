@@ -8,6 +8,7 @@ const Botao = ({
   onClick,
   disabled,
   sx,
+  icon,
 }) => {
   return (
     <Button
@@ -16,6 +17,7 @@ const Botao = ({
       color={color}
       variant={variant}
       disabled={disabled}
+      startIcon={icon}
     >
       {txt}
     </Button>

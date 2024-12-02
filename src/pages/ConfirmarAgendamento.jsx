@@ -6,6 +6,8 @@ import { Box, Grid2, Rating, TextField, Typography } from "@mui/material";
 import PageModal from "../components/pageModal/PageModal";
 import dayjs from "dayjs";
 import FloatingBotao from "../components/btn/FloatingBotao";
+import BlockIcon from "@mui/icons-material/Block";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const ConfirmarAgendamento = ({ setTitulo, setActions }) => {
   useEffect(() => {
@@ -39,6 +41,21 @@ const ConfirmarAgendamento = ({ setTitulo, setActions }) => {
     navigate("/eventos");
   };
 
+  const btns = [
+    {
+      label: "Rejeitar",
+      action: handleRejeitar,
+      icon: <BlockIcon />,
+      color: "error",
+    },
+    {
+      label: "Aceitar",
+      action: handleAceitar,
+      icon: <CheckCircleIcon />,
+      color: "success",
+    },
+  ];
+
   useEffect(() => {
     (async () => {
       const response = await fetchData("agendamentos/" + agendamentoId);
@@ -57,7 +74,7 @@ const ConfirmarAgendamento = ({ setTitulo, setActions }) => {
   return (
     <PageModal>
       <Grid2 container columnSpacing={2}>
-        <Grid2 item size={4}>
+        {/* <Grid2 item size={4}>
           <Box className="flexColumnCenter">
             <Box width="60%">
               <img width="100%" src="https://via.placeholder.com/150" />
@@ -65,8 +82,8 @@ const ConfirmarAgendamento = ({ setTitulo, setActions }) => {
             <Rating defaultValue={4} precision={0.5} readOnly />
             <Typography>Detalhes do agendamento </Typography>
           </Box>
-        </Grid2>
-        <Grid2 item size={8}>
+        </Grid2> */}
+        <Grid2 mt={10} item size={12}>
           {agendamento && (
             <Box width="80%" margin="auto">
               <Typography variant="h5" fontWeight="bold">
@@ -143,6 +160,7 @@ const ConfirmarAgendamento = ({ setTitulo, setActions }) => {
       <FloatingBotao
         handleSalvar={handleAceitar}
         handleCancelar={handleRejeitar}
+        buttons={btns}
       />
     </PageModal>
   );

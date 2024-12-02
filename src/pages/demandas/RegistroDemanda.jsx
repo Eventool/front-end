@@ -7,23 +7,35 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   Grid2,
   Modal,
   TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Registro from "../../layouts/Registro";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import dayjs from "dayjs";
 import GroupIcon from "@mui/icons-material/Group";
 import SendIcon from "@mui/icons-material/Send";
 import { useEffect, useState } from "react";
 import CampoSugestao from "../../components/input/CampoSugestao";
-import { fetchData, postData } from "../../services/DataService";
+import {
+  fetchData,
+  patchData,
+  patchParamsData,
+  postData,
+} from "../../services/DataService";
 import Botao from "../../components/btn/Botao";
 import Picklist from "../../components/input/Picklist";
 import { useAlerta } from "../../context/AlertaContext";
+import CampoTexto from "../../components/input/CampoTexto";
+import { funcoesAlocacao } from "../../utils/dataMockUtil";
+import PicklistFiltro from "../../components/input/PicklistFiltro";
 
 const RegistroDemanda = ({
   setTitulo,
@@ -35,6 +47,8 @@ const RegistroDemanda = ({
   const navigate = useNavigate();
   const { recordId } = useParams();
   const alerta = useAlerta();
+  const [escalaOptions, setEscalaOptions] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const columnsEscala = [
     {
@@ -83,7 +97,24 @@ const RegistroDemanda = ({
           <ButtonBase
             key={`view-${params.id}`}
             sx={{ marginRight: 0.5, borderRadius: 2 }}
-            onClick={() => navigate("/demandas/" + params.id)}
+            onClick={() => {
+              const newParams = new URLSearchParams(searchParams);
+              newParams.set("tab", "Agendamentos");
+
+              newParams.set(
+                "filters",
+                JSON.stringify([
+                  {
+                    field: "funcao",
+                    operator: "picklist",
+                    id: 63673,
+                    value: [params.row.funcaoEscala],
+                  },
+                ])
+              );
+
+              setSearchParams(newParams);
+            }}
           >
             <Box
               display={"flex"}
@@ -100,25 +131,114 @@ const RegistroDemanda = ({
   ];
 
   const statusStyles = {
-    Disponível: { color: "white", backgroundColor: "green" },
-    Pendente: { color: "white", backgroundColor: "orange" },
-    Confirmado: { color: "white", backgroundColor: "blue" },
-    Encerrado: { color: "white", backgroundColor: "gray" },
+    "Não Alocado": { color: "black", backgroundColor: "#e2e2e2" },
+    "Em Andamento": { color: "white", backgroundColor: "#FB8C00" },
+    Pendente: { color: "black", backgroundColor: "#FFEB3B" },
+    Confirmado: { color: "white", backgroundColor: "#2196F3" },
+    Finalizado: { color: "white", backgroundColor: "#4CAF50" },
+  };
+
+  const handleDesfazerConvite = async (id) => {
+    const response = await patchData("agendamentos", id, "reject");
+
+    if (response.error) {
+      alerta.error("Erro ao desfazer convite");
+    }
+
+    alerta.success("Convite desfeito com sucesso");
   };
 
   const columnsAgendamento = [
     {
       field: "funcao",
       headerName: "Função",
-      flex: 1.5,
+      flex: 1,
+      filterable: true,
+      filterOperators: [
+        {
+          label: "Picklist Filter",
+          value: "picklist",
+          getApplyFilterFn: (filterItem) => {
+            if (!filterItem.value || filterItem.value.length === 0) {
+              return null;
+            }
+
+            return (value) => filterItem.value.includes(value);
+          },
+          InputComponent: (props) => (
+            <PicklistFiltro
+              {...props}
+              options={[...new Set(escalaOptions.map((item) => item.value))]}
+            />
+          ),
+        },
+      ],
     },
     {
       field: "status",
       headerName: "Status",
       flex: 1,
+      align: "center",
       renderCell: (params) => {
         const style = statusStyles[params.value] || {};
-        return <Chip label={params.value} style={style} />;
+        return (
+          <Chip sx={{ width: "60%" }} label={params.value} style={style} />
+        );
+      },
+      filterable: true,
+      filterOperators: [
+        {
+          label: "Picklist Filter",
+          value: "picklist",
+          getApplyFilterFn: (filterItem) => {
+            if (!filterItem.value || filterItem.value.length === 0) {
+              return null;
+            }
+
+            return (value) => filterItem.value.includes(value);
+          },
+          InputComponent: (props) => (
+            <PicklistFiltro
+              {...props}
+              options={[
+                "Não Alocado",
+                "Pendente",
+                "Confirmado",
+                "Em Andamento",
+                "Finalizado",
+              ]}
+            />
+          ),
+        },
+      ],
+    },
+    {
+      field: "usuario",
+      headerName: "Colaborador",
+      type: "text",
+      flex: 1,
+      renderCell: (params) => {
+        return params.row.usuario ? (
+          <Typography
+            mt={1.5}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                navigate("/usuarios/" + params.row.usuario.id);
+            }}
+            role="button"
+            tabIndex={0}
+            sx={{
+              cursor: "pointer",
+              "&:hover": { textDecoration: "underline" },
+            }}
+            onClick={() => navigate("/usuarios/" + params.row.usuario.id)}
+            fontSize={16}
+          >
+            {params.row.usuario.contato.nome}
+          </Typography>
+        ) : (
+          "-"
+        );
       },
     },
     {
@@ -157,20 +277,41 @@ const RegistroDemanda = ({
             padding: "6px",
           }}
         >
-          <ButtonBase
-            key={`view-${params.id}`}
-            sx={{ marginRight: 0.5, borderRadius: 2 }}
-            onClick={() => navigate("/demandas/" + params.id)}
-          >
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              width={39}
-            >
-              <PersonAddIcon sx={{ color: "#515151" }} />
-            </Box>
-          </ButtonBase>
+          {params.row.usuario ? (
+            <Tooltip title="Remover agendamento">
+              <ButtonBase
+                key={`view-${params.id}`}
+                sx={{ marginRight: 0.5, borderRadius: 2 }}
+                onClick={() => handleDesfazerConvite(params.row.id)}
+              >
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  width={39}
+                >
+                  <PersonRemoveIcon sx={{ color: "error.main" }} />
+                </Box>
+              </ButtonBase>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Convidar usuário">
+              <ButtonBase
+                key={`view-${params.id}`}
+                sx={{ marginRight: 0.5, borderRadius: 2 }}
+                onClick={() => handleConvidarAgendamento(params.row)}
+              >
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  width={39}
+                >
+                  <PersonAddIcon sx={{ color: "#515151" }} />
+                </Box>
+              </ButtonBase>{" "}
+            </Tooltip>
+          )}
         </span>
       ),
     },
@@ -265,8 +406,8 @@ const RegistroDemanda = ({
         id: "Escalas",
         label: "Adicionar escala",
         icon: <GroupIcon />,
-        type: "create",
-        action: "/demandas/criar?eventId=",
+        type: "function",
+        action: ({ id }) => handleAdicionarEscala(id),
       },
       {
         id: "Agendamentos",
@@ -280,7 +421,6 @@ const RegistroDemanda = ({
 
   const [open, setOpen] = useState(false);
   const [userOptions, setUserOptions] = useState([]);
-  const [escalaOptions, setEscalaOptions] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedEscala, setSelectedEscala] = useState({ id: "", value: "" });
 
@@ -318,6 +458,11 @@ const RegistroDemanda = ({
     })();
   }, [open, recordId]);
 
+  const handleAdicionarEscala = (id) => {
+    setIdDemandaAtual(id);
+    setAdicionarEscalaOpen(true);
+  };
+
   const handleClose = (event, reason) => {
     if (reason && reason === "backdropClick") return;
 
@@ -347,9 +492,30 @@ const RegistroDemanda = ({
     struct = { ...struct };
     handleClose();
   };
+  const [agendamentoAtual, setAgendamentoAtual] = useState({});
+  const [convidarAgendamentoOpen, setConvidarAgendamentoOpen] = useState(false);
+
+  const handleConvidarAgendamento = (agendamento) => {
+    setAgendamentoAtual(agendamento);
+    setConvidarAgendamentoOpen(true);
+  };
+
+  const [idDemandaAtual, setIdDemandaAtual] = useState("");
+  const [adicionarEscalaOpen, setAdicionarEscalaOpen] = useState(false);
 
   return (
     <>
+      <AdicionarEscalaDialog
+        open={adicionarEscalaOpen}
+        setOpen={setAdicionarEscalaOpen}
+        id={idDemandaAtual}
+      />
+      <ConviteAgendamentoDialog
+        open={convidarAgendamentoOpen}
+        setOpen={setConvidarAgendamentoOpen}
+        agendamento={agendamentoAtual}
+        userOptions={userOptions}
+      />
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{"Convidar colaboradores"}</DialogTitle>
         <DialogContent>
@@ -391,6 +557,198 @@ const RegistroDemanda = ({
         struct={struct}
       />{" "}
     </>
+  );
+};
+
+const AdicionarEscalaDialog = ({ open, setOpen, id }) => {
+  const alerta = useAlerta();
+
+  const [disabled, setDisabled] = useState(true);
+  const [escalaAtual, setEscalaAtual] = useState({
+    funcao: {
+      id: "",
+      value: "",
+    },
+    qtdColaborador: "",
+    horasJornada: "",
+    valor: "",
+  });
+
+  useEffect(() => {
+    const { funcao, qtdColaborador, horasJornada, valor } = escalaAtual;
+
+    setDisabled(!funcao.value || !qtdColaborador || !horasJornada || !valor);
+  }, [escalaAtual]);
+
+  const handleChange = (e, name) => {
+    setEscalaAtual({ ...escalaAtual, [name]: e.target.value });
+  };
+
+  const handleFuncaoEscalaChange = (e) => {
+    const funcao = funcoesAlocacao.filter((f) => f.id === e.target.value)[0];
+    setEscalaAtual({ ...escalaAtual, funcao: funcao });
+  };
+
+  const cadastrarEscala = async () => {
+    const request = {
+      ...escalaAtual,
+      idDemanda: id,
+      funcaoEscala: escalaAtual.funcao.id,
+      valor: Number(escalaAtual.valor.replaceAll(".", "").replace(",", ".")),
+    };
+
+    const response = await postData("escalas", request);
+
+    if (response.error) {
+      alerta.error("Não foi possível adicionar a escala");
+      return;
+    }
+
+    alerta.success("Escala criada com sucesso");
+
+    handleClose();
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason && reason === "backdropClick") return;
+    setOpen(false);
+
+    setEscalaAtual({
+      funcao: {
+        id: "",
+        value: "",
+      },
+      qtdColaborador: "",
+      horasJornada: "",
+      valor: "",
+    });
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>{"Adicionar escala"}</DialogTitle>
+      <DialogContent>
+        <FormControl
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <Picklist
+            size={12}
+            label={"Função"}
+            name={"funcao"}
+            value={escalaAtual.funcao.id}
+            handleChange={handleFuncaoEscalaChange}
+            items={funcoesAlocacao}
+          />
+          <CampoTexto
+            size={12}
+            handleChange={handleChange}
+            mascara="numeroPositivo"
+            name="qtdColaborador"
+            value={escalaAtual.qtdColaborador}
+            label="Qtd Colaboradores"
+            textSize={{ min: 0, max: 48 }}
+          />
+          <CampoTexto
+            size={12}
+            handleChange={handleChange}
+            mascara="numeroPositivo"
+            name="horasJornada"
+            value={escalaAtual.horasJornada}
+            label="Horas da Jornada"
+            textSize={{ min: 0, max: 48 }}
+          />
+          <CampoTexto
+            size={12}
+            handleChange={handleChange}
+            mascara="dinheiro"
+            name="valor"
+            value={escalaAtual.valor}
+            startAdornment="R$"
+            textSize={{ min: 0, max: 48 }}
+            label="Valor"
+          />
+        </FormControl>
+      </DialogContent>
+      <DialogActions>
+        <Botao
+          variant="outlined"
+          color="primary"
+          txt="Cancelar"
+          onClick={handleClose}
+        />
+        <Botao
+          txt="Inserir Escala"
+          disabled={disabled}
+          onClick={cadastrarEscala}
+        />
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+const ConviteAgendamentoDialog = ({
+  open,
+  setOpen,
+  agendamento,
+  userOptions,
+}) => {
+  const [selectedUser, setSelectedUser] = useState({});
+  const alerta = useAlerta();
+
+  const handleConvidar = async () => {
+    const response = await patchParamsData(
+      `agendamentos/${agendamento.id}/invite`,
+      { email: selectedUser.email }
+    );
+
+    if (response.error) {
+      alerta.error("Não foi possível realizar o convite");
+      return;
+    }
+
+    alerta.success("Convite enviado com sucesso");
+    handleClose();
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason && reason === "backdropClick") return;
+    setOpen(false);
+
+    setSelectedUser({});
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{"Convidar colaboradores"}</DialogTitle>
+      <DialogContent>
+        <Grid2 container spacing={2}>
+          <TextField fullWidth value={agendamento.funcao} />
+          <CampoSugestao
+            multiple={false}
+            options={userOptions}
+            onChange={(event, value) => setSelectedUser(value)}
+          />
+        </Grid2>
+      </DialogContent>
+      <DialogActions>
+        <Botao
+          color="primary"
+          variant="outlined"
+          txt="Cancelar"
+          onClick={handleClose}
+        />
+        <Botao
+          onClick={handleConvidar}
+          disabled={!selectedUser}
+          txt="Convidar"
+        />
+      </DialogActions>
+    </Dialog>
   );
 };
 

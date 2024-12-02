@@ -24,8 +24,9 @@ const Picklist = ({
   const [error, setError] = useState(required && !value);
 
   useEffect(() => {
+    setError(required && !value);
     handleErros({ name: name, value: error });
-  }, [error, name]);
+  }, [error, name, value]);
 
   const handleValidation = (e) => {
     const selectedValue = e.target.value;

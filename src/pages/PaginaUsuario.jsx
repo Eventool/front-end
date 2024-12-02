@@ -14,6 +14,7 @@ import {
 import { fetchData } from "../services/DataService";
 import { useAlerta } from "../context/AlertaContext";
 import dayjs from "dayjs";
+import PageModal from "../components/pageModal/PageModal";
 
 const PaginaUsuario = ({ setTitulo, setActions }) => {
   const { userId } = useParams(); // ID do usuário vindo da URL
@@ -22,7 +23,7 @@ const PaginaUsuario = ({ setTitulo, setActions }) => {
   const alerta = useAlerta();
 
   useEffect(() => {
-    setTitulo("Perfil do Usuário");
+    setTitulo("");
     setActions(null);
 
     const carregarUsuario = async () => {
@@ -50,7 +51,12 @@ const PaginaUsuario = ({ setTitulo, setActions }) => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100%"
+      >
         <CircularProgress />
       </Box>
     );
@@ -65,138 +71,168 @@ const PaginaUsuario = ({ setTitulo, setActions }) => {
   }
 
   // Função para formatar CPF
-  const formatarCpf = (cpf) => cpf === null ? "Não informado" : cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  const formatarCpf = (cpf) =>
+    cpf === null
+      ? "Não informado"
+      : cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 
   const StyledTypography = styled(Typography)`
-  font-size: 14px; 
-  color: #555; 
-  background-color: #f0f0f0;
-  padding: 10px; 
-  border-radius: 20px; 
-  display: inline-block; 
-  margin-left: 32%;
-  width: 50%;
-  
-`;
-  const StyledTypography2 = styled(Typography)` 
-  margin-left: 16%;
+    font-size: 14px;
+    color: #555;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-left: 32%;
+    width: 50%;
+  `;
+  const StyledTypography2 = styled(Typography)`
+    margin-left: 16%;
   `;
 
   const StyledTypography3 = styled(Typography)`
-  margin-top: 5%;
-  margin-left: 32%;
-`;
+    margin-top: 5%;
+    margin-left: 32%;
+  `;
 
   const StyledTypography4 = styled(Typography)`
-  margin-top: 5%;
-  margin-left: 10%;
+    margin-top: 5%;
+    margin-left: 10%;
   `;
 
   const StyledTypography5 = styled(Typography)`
-  font-size: 14px; 
-  color: #555; 
-  background-color: #f0f0f0;
-  padding: 10px; 
-  border-radius: 20px; 
-  display: inline-block; 
-  margin-left: 10%;
-  width: 50%;
-  
-`;
+    font-size: 14px;
+    color: #555;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-left: 10%;
+    width: 50%;
+  `;
 
   return (
-    <Card sx={{ display: "flex", p: 3 }}>
-      {/* Coluna Esquerda */}
-      <Box sx={{ maxWidth: "300px", textAlign: "center", mr: 3 }}>
-        <CardMedia
-          component="img"
-          image="https://via.placeholder.com/150"
-          alt="Foto de perfil"
-          sx={{
-            width: 280,
-            height: 280,
-            borderRadius: 2,
-            mx: "auto",
-            objectFit: "cover",
-            marginLeft: "90px",
-            marginTop: "20px",
-          }}
-        />
-        <Typography variant="h6" sx={{ mt: 2 }} marginLeft={"140px"} fontSize={"26px"}>
-          {usuario.contato.nome}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }} marginLeft={"140px"} fontWeight="bold">
-          {usuario.tipoUsuario}
-        </Typography>
-        {/* Exibição do Rating */}
-        <Box mt={2}>
-          <Typography variant="body1" fontWeight="bold" marginLeft={"140px"}>
-            Avaliação:
-          </Typography>
-          <Rating
-            name="user-rating"
-            value={usuario.rating || 4}
-            precision={0.5}
-            readOnly
+    <PageModal>
+      <Typography mb={5} variant="h4">
+        Perfil do usuário
+      </Typography>
+      <Box display="flex">
+        {/* Coluna Esquerda */}
+        <Box sx={{ maxWidth: "300px", textAlign: "center", mr: 3 }}>
+          <CardMedia
+            component="img"
+            image="https://via.placeholder.com/150"
+            alt="Foto de perfil"
             sx={{
-              marginLeft: "140px", // Ajuste a margem para a esquerda
+              width: 280,
+              height: 280,
+              borderRadius: 2,
+              mx: "auto",
+              objectFit: "cover",
+              marginLeft: "90px",
+              marginTop: "20px",
             }}
           />
+          <Typography
+            variant="h6"
+            sx={{ mt: 2 }}
+            marginLeft={"140px"}
+            fontSize={"26px"}
+          >
+            {usuario.contato.nome}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 1 }}
+            marginLeft={"140px"}
+            fontWeight="bold"
+          >
+            {usuario.tipoUsuario.charAt(0).toUpperCase() +
+              usuario.tipoUsuario.slice(1)}
+          </Typography>
+          {/* Exibição do Rating */}
+          <Box mt={2}>
+            <Typography variant="body1" fontWeight="bold" marginLeft={"140px"}>
+              Avaliação:
+            </Typography>
+            <Rating
+              name="user-rating"
+              value={usuario.rating || 4}
+              precision={0.5}
+              readOnly
+              sx={{
+                marginLeft: "140px", // Ajuste a margem para a esquerda
+              }}
+            />
+          </Box>
         </Box>
-      </Box>
 
-      {/* Coluna Direita */}
-      <CardContent sx={{ flex: 1 }}>
-        <StyledTypography2 variant="h5" fontWeight="bold" mb={1}>
-          {usuario.contato.nome}
-        </StyledTypography2>
-        <StyledTypography2 variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {usuario.email}
-        </StyledTypography2>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <StyledTypography3 variant="body1" fontWeight="bold">
-              Nome completo:
-            </StyledTypography3>
-            <StyledTypography variant="body2">{usuario.contato.nome}</StyledTypography>
+        {/* Coluna Direita */}
+        <CardContent sx={{ flex: 1 }}>
+          <StyledTypography2 variant="h5" fontWeight="bold" mb={1}>
+            {usuario.contato.nome}
+          </StyledTypography2>
+          <StyledTypography2
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 2 }}
+          >
+            {usuario.email}
+          </StyledTypography2>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <StyledTypography3 variant="body1" fontWeight="bold">
+                Nome completo:
+              </StyledTypography3>
+              <StyledTypography variant="body2">
+                {usuario.contato.nome}
+              </StyledTypography>
+            </Grid>
+            <Grid item xs={6}>
+              <StyledTypography4 variant="body1" fontWeight="bold">
+                Idade:
+              </StyledTypography4>
+              <StyledTypography5 variant="body2">
+                {dayjs().diff(dayjs(usuario.contato.dataNascimento), "year")}{" "}
+                anos
+              </StyledTypography5>
+            </Grid>
+            <Grid item xs={6}>
+              <StyledTypography3 variant="body1" fontWeight="bold">
+                Celular:
+              </StyledTypography3>
+              <StyledTypography variant="body2">
+                {usuario.contato.celular !== null
+                  ? usuario.contato.celular.replace(
+                      /(\d{2})(\d{5})(\d{4})/,
+                      "($1) $2-$3"
+                    )
+                  : "Não informado"}
+              </StyledTypography>
+            </Grid>
+            <Grid item xs={6}>
+              <StyledTypography4 variant="body1" fontWeight="bold">
+                CPF:
+              </StyledTypography4>
+              <StyledTypography5 variant="body2">
+                {formatarCpf(usuario.contato.cpf)}
+              </StyledTypography5>
+            </Grid>
+            <Grid item xs={6}>
+              <StyledTypography3 variant="body1" fontWeight="bold">
+                Data de Nascimento:
+              </StyledTypography3>
+              <StyledTypography variant="body2">
+                {usuario.contato.dataNascimento === null
+                  ? "Não informado"
+                  : dayjs(usuario.contato.dataNascimento).format("DD/MM/YYYY")}
+              </StyledTypography>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <StyledTypography4 variant="body1" fontWeight="bold">
-              Idade:
-            </StyledTypography4>
-            <StyledTypography5 variant="body2">
-              {dayjs().diff(dayjs(usuario.contato.dataNascimento), "year")} anos
-            </StyledTypography5>
-          </Grid>
-          <Grid item xs={6}>
-            <StyledTypography3 variant="body1" fontWeight="bold">
-              Celular:
-            </StyledTypography3>
-            <StyledTypography variant="body2">
-              {usuario.contato.celular !== null ? usuario.contato.celular.replace(
-                /(\d{2})(\d{5})(\d{4})/,
-                "($1) $2-$3") : "Não informado"}
-            </StyledTypography>
-          </Grid>
-          <Grid item xs={6}>
-            <StyledTypography4 variant="body1" fontWeight="bold">
-              CPF:
-            </StyledTypography4>
-            <StyledTypography5 variant="body2">
-              {formatarCpf(usuario.contato.cpf)}
-            </StyledTypography5>
-          </Grid>
-          <Grid item xs={6}>
-            <StyledTypography3 variant="body1" fontWeight="bold">
-              Data de Nascimento:
-            </StyledTypography3>
-            <StyledTypography variant="body2">
-              {usuario.contato.dataNascimento === null ? "Não informado" : dayjs(usuario.contato.dataNascimento).format("DD/MM/YYYY")}
-            </StyledTypography>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Box>
+    </PageModal>
   );
 };
 

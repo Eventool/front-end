@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PageModal from "../components/pageModal/PageModal";
 import Imagem from "../components/imagem/Imagem";
 import { deleteData, fetchData, putData } from "../services/DataService";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import {
   Autocomplete,
@@ -140,19 +140,15 @@ const Registro = ({
       const data = await fetchData(`${struct.object.resource}/${recordId}`);
 
       if (data.error) {
-        setTimeout(() => {
-          alerta.error("Erro ao buscar objeto");
-          setLoading(false);
-          navigate("/", struct.object.resource);
-        }, 1000);
+        alerta.error("Erro ao buscar objeto");
+        setLoading(false);
+        navigate("/", struct.object.resource);
       }
 
       setObjeto(data);
       setObjetoEditado(data);
 
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setLoading(false);
     };
 
     buscarObjeto();
@@ -192,11 +188,20 @@ const Registro = ({
     });
 
     setDialogAction(() => async () => {
-      navigate(-1);
+      navigate("/" + struct.object.resource);
     });
 
     toggleDialog();
   };
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const actualTab = searchParams.get("tab");
+
+  useEffect(() => {
+    if (actualTab === null) {
+      setSearchParams({ tab: struct.tabs[0].name });
+    }
+  }, [actualTab, struct, setSearchParams]);
 
   return (
     <PageModal>
@@ -211,7 +216,9 @@ const Registro = ({
           <Box className="flexRowCenter" gap={1}>
             <ButtonBase
               onClick={() => {
-                editando ? handleConfirmarVoltar() : navigate(-1);
+                editando
+                  ? handleConfirmarVoltar()
+                  : navigate("/" + struct.object.resource);
               }}
               disableRipple
               sx={{ borderRadius: "50%", p: "8px" }}
@@ -362,7 +369,7 @@ const Registro = ({
               <Box>
                 <Grid container rowGap={3} columnSpacing={2}>
                   {struct.tabs.map((tab) => {
-                    if (tab.name !== guia) return;
+                    if (tab.name !== actualTab) return;
 
                     return tab.sections.map((section, index) => {
                       if (section.columns)
@@ -553,15 +560,31 @@ const Registro = ({
           podeAvancar={podeAvancar}
           handleSalvar={handleSalvar}
           handleCancelar={handleCancelar}
+          buttons={[
+            {
+              action: handleCancelar,
+              variant: "outlined",
+              color: "primary",
+              label: "Cancelar",
+            },
+            {
+              action: handleSalvar,
+              label: "Salvar",
+              disabled: podeAvancar,
+            },
+          ]}
         />
       )}
     </PageModal>
   );
 };
 
-const Guias = ({ guias, guiaAtual, setGuia, guiaActions, objeto }) => {
+const Guias = ({ guias, guiaActions, objeto }) => {
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const actualTab = searchParams.get("tab");
 
   return (
     <Box className="flexRowBetween">
@@ -579,10 +602,12 @@ const Guias = ({ guias, guiaAtual, setGuia, guiaActions, objeto }) => {
             return (
               <ButtonBase
                 disableRipple
-                onClick={() => setGuia(name)}
+                onClick={() => {
+                  setSearchParams({ tab: name });
+                }}
                 sx={{
                   borderBottom: `2px solid ${
-                    guiaAtual === name ? theme.palette.secondary.main : null
+                    name === actualTab ? theme.palette.secondary.main : null
                   }`,
                   pb: "4px",
                 }}
@@ -617,7 +642,7 @@ const Guias = ({ guias, guiaAtual, setGuia, guiaActions, objeto }) => {
             }
 
             return (
-              item.id === guiaAtual && (
+              item.id === actualTab && (
                 <Button
                   startIcon={item.icon}
                   key={index}
