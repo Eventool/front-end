@@ -150,7 +150,6 @@ export const getNestedValue = (obj, path) => {
 }
 
 export const updateNestedState = (obj, path, value) => {
-  //console.log(path)
   const keys = path.split('.');
   const updatedObject = { ...obj };
   let currentLevel = updatedObject;
@@ -173,3 +172,5 @@ export const formatCurrency = (value) => {
       currency: 'BRL'
   }).format(value);
 }
+
+export const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
