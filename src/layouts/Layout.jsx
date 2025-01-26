@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  BottomNavigation,
-  BottomNavigationAction,
   Box,
   Button,
   ButtonGroup,
@@ -9,16 +7,9 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "../components/navbar/Navbar";
 import BarraLateral from "../components/sidebar/BarraLateral";
-import DemandasAbertas from "../pages/demandas/DemandasAbertas";
-import DemandasFechadas from "../pages/demandas/DemandasFechadas";
 import Dashboard from "../pages/Dashboard";
 import CriarDemandas from "../pages/demandas/criarDemandas/CriarDemandas";
 import Escala from "../pages/Escala";
@@ -30,8 +21,6 @@ import NotFound from "../pages/NotFound";
 import Login from "../pages/Login";
 import Demandas from "../pages/demandas/Demandas";
 import Eventos from "../pages/eventos/Eventos";
-import EventosAbertos from "../pages/eventos/EventosAbertos";
-import EventosFechados from "../pages/eventos/EventosFechados";
 import CriarEvento from "../pages/eventos/criarEventos/CriarEvento";
 import RegistroEvento from "../pages/eventos/RegistroEvento";
 import ConfirmDialog from "../components/dialogo/ConfirmDialog";
@@ -51,19 +40,113 @@ import BottomNav from "../components/bottomNav/BottomNav";
 import { useTheme } from "@emotion/react";
 import Cadastro from "../pages/Cadastro";
 import PaginaUsuario from "../pages/PaginaUsuario";
+import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import CelebrationOutlinedIcon from "@mui/icons-material/CelebrationOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import GroupIcon from "@mui/icons-material/Group";
+import HomeIcon from "@mui/icons-material/Home";
+import MailIcon from "@mui/icons-material/MailOutlined";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 
 const Layout = () => {
-  // const [collapsed, setCollapsed] = useState(
-  //     JSON.parse(localStorage.getItem('sidebarCollapsed')) || false
-  // );
-
-  // useEffect(() => {
-  //     localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
-  // }, [collapsed]);
-
   const location = useLocation();
 
-  useEffect(() => {}, [location]);
+  const [showNav, setShowNav] = useState(false);
+  const notToShowNavPaths = useMemo(() => ["/login", "/cadastro"], []);
+
+  const menuItems = {
+    parceiro: [
+      {
+        smallText: false,
+        activePath: "/",
+        icon: <HomeIcon />,
+        linkTo: "/",
+        text: "Home",
+        sx: { mt: 2 },
+      },
+      {
+        smallText: false,
+        activePath: "/dashboard",
+        icon: <DashboardOutlinedIcon />,
+        linkTo: "/dashboard",
+        text: "Dashboard",
+      },
+      {
+        smallText: false,
+        activePath: "/eventos",
+        icon: <CelebrationOutlinedIcon />,
+        linkTo: "/eventos",
+        text: "Eventos",
+      },
+      {
+        smallText: false,
+        activePath: "/demandas",
+        icon: <AssignmentOutlinedIcon />,
+        linkTo: "/demandas",
+        text: "Demandas",
+      },
+      {
+        smallText: false,
+        activePath: "/check-in",
+        icon: <QrCodeIcon />,
+        linkTo: "/check-in",
+        text: "Check in",
+      },
+      {
+        isSubMenu: true,
+        label: "Equipe",
+        icon: <GroupIcon />,
+        items: [
+          {
+            activePath: "/formularios",
+            linkTo: "/formularios",
+            icon: <ArticleOutlinedIcon />,
+            text: "Formulários",
+            theme: "primary.lighter",
+          },
+          {
+            activePath: "/parceiros",
+            linkTo: "/parceiros",
+            icon: <ContactsOutlinedIcon />,
+            text: "Colaboradores",
+            theme: "primary.lighter",
+          },
+        ],
+      },
+    ],
+    colaborador: [
+      {
+        smallText: false,
+        activePath: "/",
+        icon: <HomeIcon />,
+        linkTo: "/",
+        text: "Home",
+        sx: { mt: 2 },
+      },
+      {
+        smallText: false,
+        activePath: "/eventos-confirmados",
+        icon: <CelebrationOutlinedIcon />,
+        linkTo: "/eventos-confirmados",
+        text: "Eventos",
+        theme: "primary.lighter",
+      },
+      {
+        smallText: false,
+        activePath: "/convites",
+        icon: <MailIcon />,
+        linkTo: "/convites",
+        text: "Convites",
+        theme: "primary.lighter",
+      },
+    ],
+  };
+
+  useEffect(() => {
+    setShowNav(!notToShowNavPaths.includes(location.pathname));
+  }, [location, notToShowNavPaths]);
 
   const [titulo, setTitulo] = useState("");
   const [actions, setActions] = useState([]);
@@ -90,44 +173,18 @@ const Layout = () => {
       />
       <Box sx={{ display: "flex", height: "100vh", flexDirection: "column" }}>
         <CssBaseline />
-        {location.pathname !== "/login" &&
-          location.pathname !== "/cadastro" && <Navbar />}
+        {showNav && <Navbar />}
         <div className="app">
-          {location.pathname !== "/login" &&
-            location.pathname !== "/cadastro" &&
-            !mobile && <BarraLateral />}
+          {showNav && !mobile && <BarraLateral menuItems={menuItems} />}
           <Box
             sx={{
-              overflow:
-                location.pathname !== "/login" &&
-                location.pathname !== "/cadastro"
-                  ? "scroll"
-                  : "hidden",
+              overflow: showNav ? "scroll" : "hidden",
             }}
-            p={
-              location.pathname !== "/login" &&
-              location.pathname !== "/cadastro"
-                ? 2
-                : 0
-            }
+            p={showNav ? 2 : 0}
             style={{
-              left: `${
-                !mobile &&
-                location.pathname !== "/login" &&
-                location.pathname !== "/cadastro"
-                  ? collapsed
-                    ? 80
-                    : 260
-                  : 0
-              }px`,
+              left: `${!mobile && showNav ? (collapsed ? 80 : 260) : 0}px`,
               width: `calc(100% - ${
-                !mobile &&
-                location.pathname !== "/login" &&
-                location.pathname !== "/cadastro"
-                  ? collapsed
-                    ? 80
-                    : 260
-                  : 0
+                !mobile && showNav ? (collapsed ? 80 : 260) : 0
               }px)`,
               bgcolor: "#f0f0f0",
             }}
@@ -168,7 +225,7 @@ const Layout = () => {
                   <Login setTitulo={setTitulo} setActions={setActions} />
                 }
               />
-             <Route
+              <Route
                 path="/cadastro"
                 element={
                   <Cadastro setTitulo={setTitulo} setActions={setActions} />
@@ -386,7 +443,7 @@ const Layout = () => {
             </Routes>
           </Box>
         </div>
-        {mobile && <BottomNav />}
+        {showNav && mobile && <BottomNav menuItems={menuItems} />}
       </Box>
     </>
   );
