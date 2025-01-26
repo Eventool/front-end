@@ -5,7 +5,6 @@ import { guestPages } from "../utils/util";
 const GuestRoute = () => {
   const { tipoUsuario } = useUser();
 
-  console.log("oiii");
   if (tipoUsuario !== null && guestPages.includes(location.pathname)) {
     return <Navigate to="/" replace />;
   }

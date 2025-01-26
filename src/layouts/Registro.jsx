@@ -35,6 +35,7 @@ import Tabela from "../components/tabela/Tabela";
 import DataHora from "../components/input/DataHora";
 import FloatingBotao from "../components/btn/FloatingBotao";
 import { useAlerta } from "../context/AlertaContext";
+import { useLayout } from "./Layout";
 
 const Registro = ({
   setTitulo = () => {},
@@ -63,6 +64,8 @@ const Registro = ({
 
   const [erros, setErros] = useState([]);
   const [podeAvancar, setAvancar] = useState(false);
+
+  const { mobile } = useLayout();
 
   const handleErros = (e) => {
     //console.log(erros);
@@ -600,6 +603,7 @@ const Registro = ({
 const Guias = ({ guias, guiaActions, objeto }) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { mobile } = useLayout();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const actualTab = searchParams.get("tab");
@@ -611,7 +615,7 @@ const Guias = ({ guias, guiaActions, objeto }) => {
         sx={{
           display: "grid",
           gridTemplateColumns: `repeat(${guias.length}, 1fr)`,
-          width: "30%",
+          width: mobile ? "100%" : "30%",
         }}
         gap={5}
       >

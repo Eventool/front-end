@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   AppBar,
   Toolbar,
@@ -13,33 +13,35 @@ import {
   Tooltip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import Botao from "../btn/Botao";
-import { ArrowDropDown, Circle } from "@mui/icons-material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import logo from "/logo.png";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useTheme } from "@emotion/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useCollapsed } from "../../context/CollapsedContext";
 import { useUser } from "../../context/UserContext";
+import { useLayout } from "../../layouts/Layout";
 
 const Navbar = () => {
   const { toggleCollapsed } = useCollapsed();
+  const { mobile } = useLayout();
 
   return (
     <AppBar elevation={4} position="static">
       <Toolbar display="flex" sx={{ justifyContent: "space-between" }}>
         <Box display="flex" alignItems={"center"}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={toggleCollapsed}
-          >
-            <MenuIcon />
-          </IconButton>
+          {!mobile && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+              onClick={toggleCollapsed}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <ButtonBase component={Link} to="/" disableRipple>
             <Box component={"img"} src={logo} height={"48px"} />
           </ButtonBase>
@@ -60,14 +62,11 @@ const MenuPerfil = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
-  const navigate = useNavigate();
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (e) => {
-    //console.log(e.target.id);
+  const handleClose = () => {
     setAnchorEl(null);
   };
 
@@ -98,30 +97,6 @@ const MenuPerfil = () => {
           </Typography>
         </MenuItem>
         <Divider />
-        {/* <MenuItem id="item2" onClick={handleClose}>
-          <Avatar sx={{ width: 25, height: 25 }}></Avatar>{" "}
-          <Typography ml={1} mr={2}>
-            Coisa 1
-          </Typography>
-        </MenuItem>
-        <MenuItem id="item3" onClick={handleClose}>
-          <Avatar sx={{ width: 25, height: 25 }}></Avatar>{" "}
-          <Typography ml={1} mr={2}>
-            Coisa 2
-          </Typography>
-        </MenuItem>
-        <MenuItem id="item4" onClick={handleClose}>
-          <Avatar sx={{ width: 25, height: 25 }}></Avatar>{" "}
-          <Typography ml={1} mr={2}>
-            Coisa 3
-          </Typography>
-        </MenuItem>
-        <MenuItem id="item5" onClick={handleClose}>
-          <Avatar sx={{ width: 25, height: 25 }}></Avatar>{" "}
-          <Typography ml={1} mr={2}>
-            Coisa 4
-          </Typography>
-        </MenuItem> */}
         <MenuItem
           id="item6"
           component={Link}
@@ -154,8 +129,7 @@ const Notificacoes = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (e) => {
-    //console.log(e.target.id);
+  const handleClose = () => {
     setAnchorEl(null);
   };
 

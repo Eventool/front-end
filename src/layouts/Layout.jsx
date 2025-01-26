@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   Box,
   Button,
@@ -52,6 +52,9 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 import { useUser } from "../context/UserContext";
 import { guestPages } from "../utils/util";
 import GuestRoute from "./GuestRoute";
+
+const LayoutContext = createContext();
+export const useLayout = () => useContext(LayoutContext);
 
 const Layout = () => {
   const location = useLocation();
@@ -164,7 +167,7 @@ const Layout = () => {
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
-    <>
+    <LayoutContext.Provider value={{ mobile }}>
       <ConfirmDialog
         action={dialogAction}
         content={dialogContent}
@@ -447,7 +450,7 @@ const Layout = () => {
         </div>
         {showNav && mobile && <BottomNav menuItems={menuItems} />}
       </Box>
-    </>
+    </LayoutContext.Provider>
   );
 };
 
