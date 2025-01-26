@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -49,12 +49,12 @@ import HomeIcon from "@mui/icons-material/Home";
 import MailIcon from "@mui/icons-material/MailOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import QrCodeIcon from "@mui/icons-material/QrCode";
+import { useUser } from "../context/UserContext";
+import { guestPages } from "../utils/util";
+import GuestRoute from "./GuestRoute";
 
 const Layout = () => {
   const location = useLocation();
-
-  const [showNav, setShowNav] = useState(false);
-  const notToShowNavPaths = useMemo(() => ["/login", "/cadastro"], []);
 
   const menuItems = {
     parceiro: [
@@ -144,9 +144,9 @@ const Layout = () => {
     ],
   };
 
-  useEffect(() => {
-    setShowNav(!notToShowNavPaths.includes(location.pathname));
-  }, [location, notToShowNavPaths]);
+  const { tipoUsuario } = useUser();
+  const showNav =
+    !guestPages.includes(location.pathname) && tipoUsuario !== null;
 
   const [titulo, setTitulo] = useState("");
   const [actions, setActions] = useState([]);
@@ -219,18 +219,20 @@ const Layout = () => {
               </Box>
             )}
             <Routes>
-              <Route
-                path="/login"
-                element={
-                  <Login setTitulo={setTitulo} setActions={setActions} />
-                }
-              />
-              <Route
-                path="/cadastro"
-                element={
-                  <Cadastro setTitulo={setTitulo} setActions={setActions} />
-                }
-              />
+              <Route element={<GuestRoute />}>
+                <Route
+                  path="/login"
+                  element={
+                    <Login setTitulo={setTitulo} setActions={setActions} />
+                  }
+                />
+                <Route
+                  path="/cadastro"
+                  element={
+                    <Cadastro setTitulo={setTitulo} setActions={setActions} />
+                  }
+                />
+              </Route>
               <Route
                 element={
                   <ProtectedRoute allowedTypes={["parceiro", "colaborador"]} />

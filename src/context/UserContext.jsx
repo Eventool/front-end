@@ -14,6 +14,11 @@ export const UserProvider = ({ children }) => {
     sessionStorage.setItem("tipoUsuario", userData.tipoUsuario);
   };
 
+  const logout = () => {
+    setTipoUsuario(null);
+    sessionStorage.removeItem("tipoUsuario");
+  };
+
   useEffect(() => {
     const storedTipoUsuario = sessionStorage.getItem("tipoUsuario");
     if (storedTipoUsuario) {
@@ -22,7 +27,9 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ tipoUsuario, setTipoUsuario, login }}>
+    <UserContext.Provider
+      value={{ tipoUsuario, setTipoUsuario, login, logout }}
+    >
       {children}
     </UserContext.Provider>
   );

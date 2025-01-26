@@ -22,6 +22,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useTheme } from "@emotion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCollapsed } from "../../context/CollapsedContext";
+import { useUser } from "../../context/UserContext";
 
 const Navbar = () => {
   const { toggleCollapsed } = useCollapsed();
@@ -70,12 +71,12 @@ const MenuPerfil = () => {
     setAnchorEl(null);
   };
 
+  const { logout } = useUser();
+
   const handleLogout = (e) => {
     handleClose(e);
 
-    sessionStorage.clear();
-
-    navigate("/login");
+    logout();
   };
 
   return (
