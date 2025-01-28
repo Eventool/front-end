@@ -1,10 +1,11 @@
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 export const fetchData = async (resource) => {
   try {
     const response = await axios.get(urlData + resource, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -23,7 +24,7 @@ export const fetchParamsData = async (resource, params) => {
   try {
     const response = await axios.get(urlData + resource, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
       params: params
     });
@@ -43,7 +44,7 @@ export const postData = async (resource, request) => {
   try {
     const response = await axios.post(urlData + resource, request, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -62,7 +63,7 @@ export const putData = async (resource, request, id) => {
   try {
     const response = await axios.put(`${urlData}${resource}/${id}`, request, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -81,7 +82,7 @@ export const patchData = async (resource, id, action) => {
   try {
     const response = await axios.patch(`${urlData}${resource}/${id}/${action}`, {}, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -101,7 +102,7 @@ export const patchParamsData = async (resource, params) => {
   try {
     const response = await axios.patch(`${urlData}${resource}`, {}, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
       params: params
     });
@@ -122,7 +123,7 @@ export const deleteData = async (resource, id) => {
   try {
     const response = await axios.delete(`${urlData}${resource}/${id}`, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -141,7 +142,7 @@ export const exportData = async (resource, params) => {
   try {
     const response = await axios.post(`${urlData}${resource}/export`, null, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
       params: params,
       responseType: "blob",

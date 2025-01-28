@@ -13,14 +13,10 @@ export const logar = async (dados) => {
 
     const { token, id, tipoUsuario, contato } = response.data;
     
-    Cookies.set('token', token);
-
-    //console.log(Cookies.get('token'));
-
-    sessionStorage.setItem("TOKEN", token);
-    sessionStorage.setItem("ID", id);
-    sessionStorage.setItem("tipoUsuario", tipoUsuario);
-    sessionStorage.setItem("nome", contato.nome);
+    Cookies.set('TOKEN', token);
+    Cookies.set("ID", id);
+    Cookies.set("tipoUsuario", tipoUsuario);
+    Cookies.set("nome", contato.nome);
 
     return response.data; 
   } catch (err) {

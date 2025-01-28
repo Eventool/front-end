@@ -22,6 +22,7 @@ import { Link } from "react-router-dom";
 import { useCollapsed } from "../../context/CollapsedContext";
 import { useUser } from "../../context/UserContext";
 import { useLayout } from "../../layouts/Layout";
+import Cookies from "js-cookie";
 
 const Navbar = () => {
   const { toggleCollapsed } = useCollapsed();
@@ -93,7 +94,7 @@ const MenuPerfil = () => {
         <MenuItem id="item1" onClick={handleClose}>
           <Avatar sx={{ width: 25, height: 25 }}>L</Avatar>{" "}
           <Typography ml={1} mr={2}>
-            {sessionStorage.getItem("nome")}
+            {Cookies.get("nome")}
           </Typography>
         </MenuItem>
         <Divider />

@@ -1,12 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Card,
-  CardActionArea,
-  CardContent,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, CardActionArea, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,9 +7,9 @@ import CelebrationOutlinedIcon from "@mui/icons-material/CelebrationOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import MailIcon from "@mui/icons-material/MailOutlined";
 import QrCodeIcon from "@mui/icons-material/QrCode";
+import Cookies from "js-cookie";
 
 const Home = ({ setTitulo, setActions }) => {
   useEffect(() => {
@@ -80,7 +72,7 @@ const Home = ({ setTitulo, setActions }) => {
       >
         <Avatar sx={{ width: 80, height: 80 }} />
         <Typography color="white" variant="h5">
-          Bem vindo(a), {sessionStorage.getItem("nome")}
+          Bem vindo(a), {Cookies.get("nome")}
         </Typography>
       </Box>
       <Box
@@ -90,12 +82,12 @@ const Home = ({ setTitulo, setActions }) => {
         gap={4}
         flexWrap="wrap"
       >
-        {sessionStorage.tipoUsuario === "parceiro" &&
+        {Cookies.get("tipoUsuario") === "parceiro" &&
           homeItemsParceiro.map((item, index) => {
             return <HomeCard key={index} {...item} />;
           })}
 
-        {sessionStorage.tipoUsuario === "colaborador" &&
+        {Cookies.get("tipoUsuario") === "colaborador" &&
           homeItemsColaborador.map((item, index) => {
             return <HomeCard key={index} {...item} />;
           })}

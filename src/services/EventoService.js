@@ -1,11 +1,12 @@
 import axios from "axios";
 import { postData, urlData } from "./DataService";
+import Cookies from 'js-cookie';
 
 export const buscarEventos = async () => {
   try {
     const response = await axios.get("http://localhost:8080/eventos", {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -34,7 +35,7 @@ export const patchImgEvento = async (request, id) => {
       request,
       {
         headers: {
-          Authorization: `Bearer ${sessionStorage.TOKEN}`,
+          Authorization: `Bearer ${Cookies.get("TOKEN")}`,
         },
       }
     );
@@ -53,7 +54,7 @@ export const putEvento = async (request, id) => {
   try {
     const response = await axios.put(urlData + "eventos/" + id, request, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -67,7 +68,7 @@ export const deleteEvento = async (id) => {
   try {
     const response = await axios.delete(urlData + "eventos/" + id, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 

@@ -148,8 +148,7 @@ const Layout = () => {
   };
 
   const { tipoUsuario } = useUser();
-  const showNav =
-    !guestPages.includes(location.pathname) && tipoUsuario !== null;
+  const showNav = !guestPages.includes(location.pathname) && !!tipoUsuario;
 
   const [titulo, setTitulo] = useState("");
   const [actions, setActions] = useState([]);
