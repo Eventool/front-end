@@ -1,6 +1,9 @@
 import { useEffect } from "react";
+import { useLayout } from "../../layouts/Layout";
 
-const EventosFechados = ({ setTitulo, setActions }) => {
+const EventosFechados = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Eventos fechados");
     setActions(null);

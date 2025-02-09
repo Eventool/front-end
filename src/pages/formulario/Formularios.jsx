@@ -30,14 +30,16 @@ import {
   putData,
 } from "../../services/DataService";
 import { useAlerta } from "../../context/AlertaContext";
+import { useLayout } from "../../layouts/Layout";
 
-const Formularios = ({
-  setTitulo,
-  setActions,
-  toggleDialog,
-  setDialogContent,
-  setDialogAction,
-}) => {
+const Formularios = () => {
+  const {
+    setTitulo,
+    setActions,
+    toggleDialog,
+    setDialogContent,
+    setDialogAction,
+  } = useLayout();
   const theme = useTheme();
   const alerta = useAlerta();
 

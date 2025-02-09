@@ -19,14 +19,17 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 import { numToMes } from "../../utils/util";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useTheme } from "@emotion/react";
+import { useLayout } from "../../layouts/Layout";
 
-const RegistroConvite = ({
-  setTitulo,
-  setActions,
-  toggleDialog,
-  setDialogContent,
-  setDialogAction,
-}) => {
+const RegistroConvite = () => {
+  const {
+    setTitulo,
+    setActions,
+    toggleDialog,
+    setDialogContent,
+    setDialogAction,
+  } = useLayout();
+
   const captureRef = useRef(null);
 
   const [convite, setConvite] = useState({});

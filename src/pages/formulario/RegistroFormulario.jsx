@@ -17,14 +17,11 @@ import OutlinedBox from "../../components/box/OutlinedBox";
 import Grid from "@mui/material/Grid2";
 import { BarChart } from "@mui/x-charts";
 import dayjs from "dayjs";
+import { useLayout } from "../../layouts/Layout";
 
-const RegistroFormulario = ({
-  setTitulo,
-  setActions,
-  toggleDialog,
-  setDialogContent,
-  setDialogAction,
-}) => {
+const RegistroFormulario = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("");
     setActions(null);

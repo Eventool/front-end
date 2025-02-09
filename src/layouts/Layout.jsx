@@ -148,25 +148,34 @@ const Layout = () => {
   };
 
   const { tipoUsuario } = useUser();
-  const showNav = !guestPages.includes(location.pathname) && !!tipoUsuario;
+  const { collapsed } = useCollapsed();
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [titulo, setTitulo] = useState("");
-  const [actions, setActions] = useState([]);
+  const showNav = !guestPages.includes(location.pathname) && !!tipoUsuario;
 
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
   const [dialogAction, setDialogAction] = useState(null);
 
+  const [titulo, setTitulo] = useState("");
+  const [actions, setActions] = useState([]);
+
   const toggleDialog = () => {
     setOpenDialog(!openDialog);
   };
 
-  const { collapsed } = useCollapsed();
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down("md"));
-
   return (
-    <LayoutContext.Provider value={{ mobile }}>
+    <LayoutContext.Provider
+      value={{
+        mobile,
+        toggleDialog,
+        setDialogAction,
+        setDialogContent,
+        setTitulo,
+        setActions,
+      }}
+    >
       <ConfirmDialog
         action={dialogAction}
         content={dialogContent}
@@ -199,23 +208,19 @@ const Layout = () => {
                   justifyContent={"space-between"}
                   alignItems={"flex-end"}
                 >
-                  <Typography variant="h4" component="h4">
-                    {titulo}
-                  </Typography>
+                  <Typography variant="h4">{titulo}</Typography>
                   <ButtonGroup variant="contained" color="secondary">
                     {actions &&
-                      actions.map((action, index) => {
-                        return (
-                          <Button
-                            startIcon={action.icon}
-                            key={index}
-                            onClick={action.handleClick}
-                            disabled={action.isLoading}
-                          >
-                            {action.label}
-                          </Button>
-                        );
-                      })}
+                      actions.map((action, index) => (
+                        <Button
+                          startIcon={action.icon}
+                          key={index}
+                          onClick={action.handleClick}
+                          disabled={action.isLoading}
+                        >
+                          {action.label}
+                        </Button>
+                      ))}
                   </ButtonGroup>
                 </Box>
                 <Breadcrumb />
@@ -223,232 +228,65 @@ const Layout = () => {
             )}
             <Routes>
               <Route element={<GuestRoute />}>
-                <Route
-                  path="/login"
-                  element={
-                    <Login setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/cadastro"
-                  element={
-                    <Cadastro setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/cadastro" element={<Cadastro />} />
               </Route>
               <Route
                 element={
                   <ProtectedRoute allowedTypes={["parceiro", "colaborador"]} />
                 }
               >
-                <Route
-                  path="/"
-                  element={
-                    <Home setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/configuracoes"
-                  element={
-                    <Configuracoes
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
+                <Route path="/" element={<Home />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
               </Route>
-
               <Route element={<ProtectedRoute allowedTypes={["parceiro"]} />}>
-                <Route
-                  path="/"
-                  element={
-                    <Home setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <Dashboard setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/eventos"
-                  element={
-                    <Eventos setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/check-in"
-                  element={
-                    <CheckIn setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/eventos" element={<Eventos />} />
+                <Route path="/check-in" element={<CheckIn />} />
                 <Route
                   path="/check-in/:agendamentoId"
-                  element={
-                    <ConfirmarAgendamento
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<ConfirmarAgendamento />}
                 />
-                <Route
-                  path="/eventos/:recordId"
-                  element={
-                    <RegistroEvento
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
+                <Route path="/eventos/:recordId" element={<RegistroEvento />} />
                 <Route
                   path="/demandas/:recordId"
-                  element={
-                    <RegistroDemanda
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<RegistroDemanda />}
                 />
-                <Route
-                  path="/usuarios/:userId"
-                  element={
-                    <PaginaUsuario
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/eventos/criar"
-                  element={
-                    <CriarEvento
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/demandas"
-                  element={
-                    <Demandas setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/demandas/criar"
-                  element={
-                    <CriarDemandas
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/escala"
-                  element={
-                    <Escala setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/formularios"
-                  element={
-                    <Formularios
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
+                <Route path="/usuarios/:userId" element={<PaginaUsuario />} />
+                <Route path="/eventos/criar" element={<CriarEvento />} />
+                <Route path="/demandas" element={<Demandas />} />
+                <Route path="/demandas/criar" element={<CriarDemandas />} />
+                <Route path="/escala" element={<Escala />} />
+                <Route path="/formularios" element={<Formularios />} />
                 <Route
                   path="/formularios/:recordId"
-                  element={
-                    <RegistroFormulario
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<RegistroFormulario />}
                 />
-                <Route
-                  path="/parceiros"
-                  element={
-                    <Parceiros setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="*"
-                  element={
-                    <NotFound setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
+                <Route path="/parceiros" element={<Parceiros />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
-
               <Route
                 element={<ProtectedRoute allowedTypes={["colaborador"]} />}
               >
                 <Route
                   path="/eventos-confirmados"
-                  element={
-                    <EventosConfirmados
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<EventosConfirmados />}
                 />
                 <Route
                   path="/eventos-pendentes"
-                  element={
-                    <EventosPendentes
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<EventosPendentes />}
                 />
-                <Route
-                  path="/eventos/buscar"
-                  element={
-                    <BuscarEventos
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/convites"
-                  element={
-                    <Convites setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
+                <Route path="/eventos/buscar" element={<BuscarEventos />} />
+                <Route path="/convites" element={<Convites />} />
                 <Route
                   path="/convites/:recordId"
-                  element={
-                    <RegistroConvite
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<RegistroConvite />}
                 />
               </Route>
             </Routes>
           </Box>
         </div>
-        {showNav && mobile && <BottomNav menuItems={menuItems} />}
+        {showNav && mobile && <BottomNav />}
       </Box>
     </LayoutContext.Provider>
   );

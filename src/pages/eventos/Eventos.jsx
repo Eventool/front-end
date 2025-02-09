@@ -20,8 +20,11 @@ import {
   fetchData,
   fetchParamsData,
 } from "../../services/DataService";
+import { useLayout } from "../../layouts/Layout";
 
-const Eventos = ({ setTitulo, setActions }) => {
+const Eventos = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const status = queryParams.get("status");

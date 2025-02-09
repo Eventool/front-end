@@ -36,14 +36,16 @@ import { useAlerta } from "../../context/AlertaContext";
 import CampoTexto from "../../components/input/CampoTexto";
 import { funcoesAlocacao } from "../../utils/dataMockUtil";
 import PicklistFiltro from "../../components/input/PicklistFiltro";
+import { useLayout } from "../../layouts/Layout";
 
-const RegistroDemanda = ({
-  setTitulo,
-  setActions,
-  toggleDialog,
-  setDialogContent,
-  setDialogAction,
-}) => {
+const RegistroDemanda = () => {
+  const {
+    setTitulo,
+    setActions,
+    toggleDialog,
+    setDialogContent,
+    setDialogAction,
+  } = useLayout();
   const navigate = useNavigate();
   const { recordId } = useParams();
   const alerta = useAlerta();

@@ -6,14 +6,16 @@ import { estados } from "../../utils/dataMockUtil";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import Registro from "../../layouts/Registro";
+import { useLayout } from "../../layouts/Layout";
 
-const RegistroEvento = ({
-  setTitulo,
-  setActions,
-  toggleDialog,
-  setDialogContent,
-  setDialogAction,
-}) => {
+const RegistroEvento = () => {
+  const {
+    setTitulo,
+    setActions,
+    toggleDialog,
+    setDialogContent,
+    setDialogAction,
+  } = useLayout();
   const navigate = useNavigate();
 
   const columnsDemanda = [

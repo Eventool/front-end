@@ -17,15 +17,17 @@ import { useAlerta } from "../context/AlertaContext";
 import { useNavigate } from "react-router-dom";
 
 import dayjs from "dayjs";
+import { useLayout } from "../layouts/Layout";
 
-const Parceiros = ({ setTitulo, setActions }) => {
+const Parceiros = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Parceiros");
     setActions(null);
   }, []);
 
   const alerta = useAlerta();
-
 
   const [usuarios, setUsuarios] = useState([]);
   const [usuariosData, setUsuariosData] = useState([]);
@@ -110,9 +112,12 @@ const CardUsuario = (usuario) => {
               {user.email}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {user?.contato?.celular
-            ? user.contato.celular.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")
-            : "Número indisponível"}
+              {user?.contato?.celular
+                ? user.contato.celular.replace(
+                    /(\d{2})(\d{5})(\d{4})/,
+                    "($1) $2-$3"
+                  )
+                : "Número indisponível"}
             </Typography>
             <Stack mt={2}>
               <Rating defaultValue={4} precision={0.5} readOnly />

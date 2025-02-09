@@ -4,8 +4,11 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import QRScanner from "../components/input/QRScanner";
 import { fetchData, fetchParamsData } from "../services/DataService";
 import { useNavigate } from "react-router-dom";
+import { useLayout } from "../layouts/Layout";
 
-const CheckIn = ({ setTitulo, setActions }) => {
+const CheckIn = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("");
     setActions(null);

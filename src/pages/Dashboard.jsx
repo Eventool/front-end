@@ -3,8 +3,11 @@ import { Box, Paper, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { LineChart, PieChart, ResponsiveChartContainer } from "@mui/x-charts";
 import { useTheme } from "@emotion/react";
+import { useLayout } from "../layouts/Layout";
 
-const Dashboard = ({ setTitulo, setActions }) => {
+const Dashboard = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Dashboard");
     setActions(null);

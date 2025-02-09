@@ -38,8 +38,11 @@ import EditorRichText from "../../components/input/EditorRichText";
 import { formatCurrency, numToMes } from "../../utils/util";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useLayout } from "../../layouts/Layout";
 
-const Convites = ({ setTitulo, setActions }) => {
+const Convites = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Convites");
     setActions(null);

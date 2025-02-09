@@ -15,8 +15,11 @@ import { fetchData } from "../services/DataService";
 import { useAlerta } from "../context/AlertaContext";
 import dayjs from "dayjs";
 import PageModal from "../components/pageModal/PageModal";
+import { useLayout } from "../layouts/Layout";
 
-const PaginaUsuario = ({ setTitulo, setActions }) => {
+const PaginaUsuario = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const { userId } = useParams(); // ID do usuário vindo da URL
   const [usuario, setUsuario] = useState(null); // Estado para armazenar os dados do usuário
   const [loading, setLoading] = useState(true); // Estado de carregamento

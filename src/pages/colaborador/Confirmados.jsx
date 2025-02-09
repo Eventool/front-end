@@ -6,8 +6,11 @@ import { Box } from "@mui/material";
 import { CardConvite } from "./Convites";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useLayout } from "../../layouts/Layout";
 
-const EventosConfirmados = ({ setTitulo, setActions }) => {
+const EventosConfirmados = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Eventos");
     setActions(null);

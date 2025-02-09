@@ -20,8 +20,11 @@ import imagemFundo from "../assets/Login.png";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { emailRegex } from "../utils/util";
+import { useLayout } from "../layouts/Layout";
 
-const Login = ({ setTitulo, setActions }) => {
+const Login = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const { login } = useUser();
   const [dados, setDados] = useState({ email: "", senha: "" });
   const navigate = useNavigate();

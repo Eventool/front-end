@@ -12,8 +12,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import Tabela from "../../components/tabela/Tabela";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { fetchData } from "../../services/DataService";
+import { useLayout } from "../../layouts/Layout";
 
-const Demandas = ({ setTitulo, setActions }) => {
+const Demandas = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const [demandas, setDemandas] = useState([]);
   const [dataDemandas, setDataDemandas] = useState([]);
 

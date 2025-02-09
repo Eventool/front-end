@@ -8,8 +8,11 @@ import dayjs from "dayjs";
 import FloatingBotao from "../components/btn/FloatingBotao";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useLayout } from "../layouts/Layout";
 
-const ConfirmarAgendamento = ({ setTitulo, setActions }) => {
+const ConfirmarAgendamento = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("");
     setActions(null);

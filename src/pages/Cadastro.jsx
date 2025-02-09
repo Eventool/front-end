@@ -24,8 +24,11 @@ import PersonIcon from "@mui/icons-material/Person";
 import imagemFundo from "../assets/Cadastro.png";
 import { Password } from "@mui/icons-material";
 import { emailRegex } from "../utils/util";
+import { useLayout } from "../layouts/Layout";
 
-const Cadastro = ({ setTitulo, setActions }) => {
+const Cadastro = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const { login } = useUser();
   const navigate = useNavigate();
 

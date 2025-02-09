@@ -13,8 +13,11 @@ import { postEvento } from "../../../services/EventoService";
 import { fetchData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
 import dayjs from "dayjs";
+import { useLayout } from "../../../layouts/Layout";
 
-const CriarEvento = ({ setTitulo, setActions }) => {
+const CriarEvento = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("");
     setActions(null);

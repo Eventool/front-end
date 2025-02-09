@@ -10,8 +10,11 @@ import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import MailIcon from "@mui/icons-material/MailOutlined";
 import QrCodeIcon from "@mui/icons-material/QrCode";
 import Cookies from "js-cookie";
+import { useLayout } from "../layouts/Layout";
 
-const Home = ({ setTitulo, setActions }) => {
+const Home = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("");
     setActions(null);

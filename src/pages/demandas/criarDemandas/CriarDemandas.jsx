@@ -12,8 +12,11 @@ import Finalizar from "./Finalizar";
 import { fetchData, postData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
 import dayjs from "dayjs";
+import { useLayout } from "../../../layouts/Layout";
 
-const CriarDemandas = ({ setTitulo, setActions }) => {
+const CriarDemandas = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const navigate = useNavigate();
   const alerta = useAlerta();
 
