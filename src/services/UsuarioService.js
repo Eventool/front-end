@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 
 export const logar = async (dados) => {
   try {
-    const response = await axios.post("http://localhost:8080/usuarios/login", {
+    const response = await axios.post(urlData + "usuarios/login", {
       email: dados.email,
       senha: dados.senha,
     });

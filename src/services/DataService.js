@@ -166,4 +166,4 @@ export const exportData = async (resource, params) => {
   }
 };
 
-export const urlData = "http://localhost:8080/";
+export const urlData = "http://localhost:8080/api/";

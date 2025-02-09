@@ -210,6 +210,7 @@ const Layout = () => {
                             startIcon={action.icon}
                             key={index}
                             onClick={action.handleClick}
+                            disabled={action.isLoading}
                           >
                             {action.label}
                           </Button>

@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 
 export const buscarEventos = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/eventos", {
+    const response = await axios.get(urlData + "eventos", {
       headers: {
         Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
