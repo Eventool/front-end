@@ -1,10 +1,12 @@
 import axios from "axios";
+import Cookies from 'js-cookie';
+import { urlData } from "./DataService";
 
 export const buscarDemandas = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/demandas", {
+    const response = await axios.get(urlData + "demandas", {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 

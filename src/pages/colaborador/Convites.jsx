@@ -37,6 +37,7 @@ import Botao from "../../components/btn/Botao";
 import EditorRichText from "../../components/input/EditorRichText";
 import { formatCurrency, numToMes } from "../../utils/util";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Convites = ({ setTitulo, setActions }) => {
   useEffect(() => {
@@ -59,7 +60,7 @@ const Convites = ({ setTitulo, setActions }) => {
   useEffect(() => {
     (async () => {
       const response = await fetchData(
-        `agendamentos/usuario/${sessionStorage.ID}`
+        `agendamentos/usuario/${Cookies.get("ID")}`
       );
 
       if (response.error) {

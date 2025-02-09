@@ -5,6 +5,7 @@ import MudarVisualizacao from "../../components/mudarVisualizacao/MudarVisualiza
 import { Box } from "@mui/material";
 import { CardConvite } from "./Convites";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const EventosConfirmados = ({ setTitulo, setActions }) => {
   useEffect(() => {
@@ -21,7 +22,7 @@ const EventosConfirmados = ({ setTitulo, setActions }) => {
   useEffect(() => {
     (async () => {
       const response = await fetchData(
-        `agendamentos/usuario/${sessionStorage.ID}`
+        `agendamentos/usuario/${Cookies.get("ID")}`
       );
 
       if (response.error) {

@@ -1,11 +1,12 @@
 import axios from "axios";
 import { urlData } from "./DataService";
+import Cookies from "js-cookie";
 
 export const convidarUsuarios = async (request, id) => {
     try {
         const response = await axios.post(`${urlData}escalas/${id}/invite`, request, {
           headers: {
-            Authorization: `Bearer ${sessionStorage.TOKEN}`,
+            Authorization: `Bearer ${Cookies.get("TOKEN")}`,
           },
         });
     

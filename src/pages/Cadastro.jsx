@@ -23,6 +23,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
 import imagemFundo from "../assets/Cadastro.png";
 import { Password } from "@mui/icons-material";
+import { emailRegex } from "../utils/util";
 
 const Cadastro = ({ setTitulo, setActions }) => {
   const { login } = useUser();
@@ -88,20 +89,37 @@ const Cadastro = ({ setTitulo, setActions }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         alignItems: "center",
+        overflow: "auto",
       }}
     >
-      <Paper
+      <Box
         sx={{
-          width: "26%",
-          height: "79%",
-          p: 8,
-          borderRadius: 10,
-          display: "flex",
-          flexDirection: "column",
-          marginLeft: "710px",
-          boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.3)",
+          bgcolor: "#ffffff",
+          width: {
+            xs: "100%",
+            sm: 450,
+          },
+          height: {
+            xs: "100%",
+            sm: "auto",
+          },
+
+          left: {
+            xs: 0,
+            sm: 140,
+          },
+          p: {
+            xs: 8,
+            sm: 4,
+          },
+          borderRadius: {
+            xs: 0,
+            sm: 3,
+          },
+          boxShadow:
+            "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
         }}
       >
         <Typography
@@ -156,6 +174,8 @@ const Cadastro = ({ setTitulo, setActions }) => {
           handleChange={handleChange}
           startAdornment={<EmailIcon />}
           borderRadius={"9px"}
+          regex={emailRegex}
+          defaultMessage={"E-mail inválido"}
         />
 
         <Typography
@@ -220,7 +240,7 @@ const Cadastro = ({ setTitulo, setActions }) => {
             <CircularProgress color="secondary" />
           )}
         </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 };

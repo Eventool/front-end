@@ -1,7 +1,8 @@
-import { InputAdornment, TextField } from "@mui/material";
+import { Box, InputAdornment, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import React, { useEffect, useState } from "react";
 import { aplicarMascara } from "../../utils/util";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const CampoTexto = ({
   handleChange = () => {},
@@ -28,12 +29,15 @@ const CampoTexto = ({
 }) => {
   const [possuiErro, setErro] = useState(false);
   const [msgErro, setMsgErro] = useState(defaultMessage);
+  const [firstInteracted, setFirstInteracted] = useState(false);
 
   useEffect(() => {
     handleErros({ name: name, value: possuiErro });
   }, [possuiErro, name]);
 
   const handleOnChange = (e) => {
+    setFirstInteracted(true);
+
     let valorAtual = e.target.value.slice(0, textSize.max);
 
     if (mascara) valorAtual = aplicarMascara(valorAtual, mascara);
@@ -88,8 +92,21 @@ const CampoTexto = ({
         name={name}
         value={value}
         onChange={handleOnChange}
-        error={possuiErro}
-        helperText={possuiErro ? msgErro : ""}
+        error={firstInteracted && possuiErro}
+        helperText={
+          firstInteracted && possuiErro ? (
+            <Typography
+              variant="caption"
+              component="span"
+              sx={{ display: "flex", alignItems: "center", gap: "6px" }}
+            >
+              <InfoOutlinedIcon sx={{ fontSize: 15 }} />
+              {msgErro}
+            </Typography>
+          ) : (
+            ""
+          )
+        }
         required={required}
         onKeyUp={onKeyUp}
         variant="outlined"

@@ -16,9 +16,10 @@ import {
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import CreateIcon from "@mui/icons-material/Create";
-import EditIcon from "@mui/icons-material/Edit";
+import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import CachedIcon from "@mui/icons-material/Cached";
 import { getFormularios } from "../../utils/dataMockUtil";
 import Botao from "../../components/btn/Botao";
 import { useNavigate } from "react-router-dom";
@@ -51,20 +52,22 @@ const Formularios = ({
 
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
   const [novoFormulario, setNovoFormulario] = useState({});
+  const [isIntegrationLoading, setIsIntegrationLoading] = useState(false);
 
   useEffect(() => {
     const actions = [
       {
-        label: "Criar",
+        label: "Atualizar",
         handleClick: () => {
-          setNovoDialogOpen(true);
+          handleIntegrarFormularios();
         },
-        icon: <CreateIcon />,
+        icon: <CachedIcon />,
+        isLoading: isIntegrationLoading,
       },
     ];
 
     setActions(actions);
-  }, [setActions, formulario, novoFormulario]);
+  }, [setActions, formulario, novoFormulario, isIntegrationLoading]);
 
   useEffect(() => {
     (async () => {
@@ -78,6 +81,22 @@ const Formularios = ({
       setFormularios(response);
     })();
   }, [setFormularios, alerta]);
+
+  const handleIntegrarFormularios = async () => {
+    setIsIntegrationLoading(true);
+
+    const response = await postData(`forms/google`);
+
+    if (response.error) {
+      alerta.error("Erro ao atualizar formulários");
+      return;
+    }
+
+    alerta.success("Formulários atualizados com sucesso");
+
+    setFormularios(response);
+    setIsIntegrationLoading(false);
+  };
 
   const openEditarDialog = (formulario) => {
     setFormulario(formulario);
@@ -242,14 +261,9 @@ const CardFormulario = ({
       </Box>
       <Box className="flexRowCenter" gap={3}>
         <ButtonGroup color="primary" variant="text">
-          <Tooltip title="Copiar link">
-            <Button onClick={() => handleCopyClick(formulario)}>
-              <ContentPasteIcon />
-            </Button>
-          </Tooltip>
-          <Tooltip title="Editar">
-            <Button onClick={() => openEditarDialog(formulario)}>
-              <EditIcon />
+          <Tooltip title="Compartilhar link">
+            <Button onClick={() => {}}>
+              <ShareIcon />
             </Button>
           </Tooltip>
           <Tooltip title="Excluir">
