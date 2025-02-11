@@ -356,10 +356,16 @@ const ModalConvite = ({
   );
 };
 
-const ColumnTextField = ({ label, value, size = { xs: 12, sm: 6 } }) => {
+export const ColumnTextField = ({
+  id,
+  label,
+  value,
+  size = { xs: 12, sm: 6 },
+}) => {
   return (
     <Grid2 item size={size}>
       <TextField
+        id={id}
         fullWidth
         variant="standard"
         label={label}

@@ -286,7 +286,7 @@ const Layout = () => {
             </Routes>
           </Box>
         </div>
-        {showNav && mobile && <BottomNav />}
+        {showNav && mobile && <BottomNav menuItems={menuItems} />}
       </Box>
     </LayoutContext.Provider>
   );

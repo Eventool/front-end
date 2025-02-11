@@ -49,11 +49,6 @@ const Formularios = () => {
 
   const [formularios, setFormularios] = useState([]);
 
-  const [editarDialogOpen, setEditarDialogOpen] = useState(false);
-  const [formulario, setFormulario] = useState({});
-
-  const [novoDialogOpen, setNovoDialogOpen] = useState(false);
-  const [novoFormulario, setNovoFormulario] = useState({});
   const [isIntegrationLoading, setIsIntegrationLoading] = useState(false);
 
   useEffect(() => {
@@ -69,7 +64,7 @@ const Formularios = () => {
     ];
 
     setActions(actions);
-  }, [setActions, formulario, novoFormulario, isIntegrationLoading]);
+  }, [setActions, isIntegrationLoading]);
 
   useEffect(() => {
     (async () => {
@@ -100,70 +95,8 @@ const Formularios = () => {
     setIsIntegrationLoading(false);
   };
 
-  const openEditarDialog = (formulario) => {
-    setFormulario(formulario);
-    setEditarDialogOpen(true);
-  };
-
-  const closeEditarDialog = () => {
-    setEditarDialogOpen(false);
-  };
-
-  const handleEditarFormulario = (e) => {
-    setFormulario({ ...formulario, [e.target.name]: e.target.value });
-  };
-
-  const handleEditarFormularios = async (novoFormularioAtualizado) => {
-    const response = await putData(
-      "forms",
-      novoFormularioAtualizado,
-      novoFormularioAtualizado.id
-    );
-
-    if (response.error) {
-      console.error(response);
-      return;
-    }
-
-    alerta.success("Formulário atualizado com sucesso.");
-    closeEditarDialog();
-  };
-
-  const closeNovoDialog = () => {
-    setNovoDialogOpen(false);
-  };
-
-  const handleNovoFormulario = (e) => {
-    setNovoFormulario({ ...novoFormulario, [e.target.name]: e.target.value });
-  };
-
-  const handleCriarFormulario = async () => {
-    const response = await postData("forms", novoFormulario);
-
-    if (response.error) {
-      alerta.error("Erro ao criar formulário.");
-      return;
-    }
-
-    alerta.success("Formulário criado com sucesso.");
-    closeNovoDialog();
-  };
-
   return (
     <>
-      <EditarDialog
-        formulario={formulario}
-        closeEditarDialog={closeEditarDialog}
-        handleEditarFormularios={() => handleEditarFormularios(formulario)}
-        open={editarDialogOpen}
-        handleEditarFormulario={handleEditarFormulario}
-      />
-      <NovoDialog
-        closeNovoDialog={closeNovoDialog}
-        open={novoDialogOpen}
-        handleNovoFormulario={handleNovoFormulario}
-        handleCriarFormulario={handleCriarFormulario}
-      />
       <Box className="flexColumn" gap={2}>
         {formularios &&
           formularios.map((formulario, index) => {
@@ -172,7 +105,6 @@ const Formularios = () => {
                 key={index}
                 theme={theme}
                 formulario={formulario}
-                openEditarDialog={openEditarDialog}
                 toggleDialog={toggleDialog}
                 setDialogAction={setDialogAction}
                 setDialogContent={setDialogContent}
@@ -190,20 +122,12 @@ const Formularios = () => {
 const CardFormulario = ({
   formulario,
   theme,
-  openEditarDialog,
   toggleDialog,
   setDialogContent,
   setDialogAction,
   alerta,
 }) => {
   const navigate = useNavigate();
-
-  const handleCopyClick = (formulario) => {
-    navigator.clipboard.writeText(formulario.url);
-    alerta.success(
-      `Link para formulário ${formulario.nome} copiado para área de transferência`
-    );
-  };
 
   const handleClick = () => {
     navigate("/formularios/" + formulario.id);
@@ -276,89 +200,6 @@ const CardFormulario = ({
         </ButtonGroup>
       </Box>
     </Box>
-  );
-};
-
-const EditarDialog = ({
-  closeEditarDialog,
-  open,
-  formulario,
-  handleEditarFormulario,
-  handleEditarFormularios,
-}) => {
-  return (
-    <Dialog open={open} onClose={closeEditarDialog}>
-      <DialogTitle>Editar Formulário</DialogTitle>
-      <DialogContent>
-        <TextField
-          onChange={handleEditarFormulario}
-          margin="dense"
-          name="nome"
-          value={formulario.nome}
-          label="Nome"
-          variant="standard"
-          fullWidth
-        />
-        <TextField
-          onChange={handleEditarFormulario}
-          margin="dense"
-          name="url"
-          value={formulario.url}
-          label="Link"
-          variant="standard"
-          fullWidth
-        />
-      </DialogContent>
-      <DialogActions>
-        <Botao
-          onClick={closeEditarDialog}
-          variant="outlined"
-          color="primary"
-          txt="Cancelar"
-        />
-        <Botao onClick={handleEditarFormularios} txt="Confirmar" />
-      </DialogActions>
-    </Dialog>
-  );
-};
-
-const NovoDialog = ({
-  closeNovoDialog,
-  open,
-  handleNovoFormulario,
-  handleCriarFormulario,
-}) => {
-  return (
-    <Dialog open={open} onClose={closeNovoDialog}>
-      <DialogTitle>Novo Formulário</DialogTitle>
-      <DialogContent>
-        <TextField
-          onChange={handleNovoFormulario}
-          margin="dense"
-          name="nome"
-          label="Nome"
-          variant="standard"
-          fullWidth
-        />
-        <TextField
-          onChange={handleNovoFormulario}
-          margin="dense"
-          name="url"
-          label="Link"
-          variant="standard"
-          fullWidth
-        />
-      </DialogContent>
-      <DialogActions>
-        <Botao
-          onClick={closeNovoDialog}
-          variant="outlined"
-          color="primary"
-          txt="Cancelar"
-        />
-        <Botao onClick={handleCriarFormulario} txt="Confirmar" />
-      </DialogActions>
-    </Dialog>
   );
 };
 

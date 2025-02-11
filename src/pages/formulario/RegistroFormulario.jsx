@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import PageModal from "../../components/pageModal/PageModal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { fetchData } from "../../services/DataService";
 import { useAlerta } from "../../context/AlertaContext";
 import {
   Backdrop,
+  Button,
   ButtonBase,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  Grid2,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
@@ -18,9 +25,14 @@ import Grid from "@mui/material/Grid2";
 import { BarChart } from "@mui/x-charts";
 import dayjs from "dayjs";
 import { useLayout } from "../../layouts/Layout";
+import { ColumnTextField } from "../colaborador/Convites";
 
 const RegistroFormulario = () => {
   const { setTitulo, setActions } = useLayout();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const actualTab = searchParams.get("tab");
+  if (!actualTab) setSearchParams({ tab: "visaoGeral" });
 
   useEffect(() => {
     setTitulo("");
@@ -35,6 +47,7 @@ const RegistroFormulario = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
       const response = await fetchData(`forms/${recordId}/google`);
 
@@ -48,7 +61,7 @@ const RegistroFormulario = () => {
       setFormData(response);
       setLoading(false);
     })();
-  }, [recordId]);
+  }, [recordId, alerta]);
 
   const getRespostas = (respostas, tipo) => {
     const baseStyle = {
@@ -142,74 +155,256 @@ const RegistroFormulario = () => {
     }
   };
 
+  const [resDialogOpen, setResDialogOpen] = useState(false);
+
+  const [resAtual, setResAtual] = useState();
+
+  const handleClick = (res) => {
+    setResAtual(mapearRespostas(res));
+    console.log(mapearRespostas(res));
+    setResDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setResDialogOpen(false);
+    setResAtual(null);
+  };
+
+  const { mobile } = useLayout();
+
+  const mapearRespostas = (dados) => {
+    return dados.respostas.reduce((acc, item) => {
+      acc[item.idQuestao] = item.valores.join(", "); // Junta múltiplos valores em uma string
+      return acc;
+    }, {});
+  };
+
   return (
-    <PageModal>
-      <Backdrop
-        open={loading}
-        sx={(theme) => ({ zIndex: theme.zIndex.drawer + 2 })}
-      >
-        <CircularProgress />
-      </Backdrop>
-      {!loading && (
-        <Box mb={1} className="flexRowBetween">
-          <Box className="flexRowCenter" gap={1}>
-            <ButtonBase
-              onClick={() => {
-                navigate("/formularios");
-              }}
-              disableRipple
-              sx={{ borderRadius: "50%", p: "8px" }}
-            >
-              <ArrowBackIosIcon fontSize="32px" />
-            </ButtonBase>
-            <Typography variant="h6">Formulário</Typography>
-          </Box>
-        </Box>
-      )}
-      {!loading && formData && (
-        <>
-          <Box
-            sx={(theme) => ({
-              position: "sticky",
-              top: -16,
-              zIndex: theme.zIndex.drawer - 1,
-              bgcolor: "#ffffff",
-            })}
-          >
-            <Box
-              mb={3}
-              p={1}
-              className="flexRowBetween"
-              sx={{ alignItems: "flex-end" }}
-            >
-              <Box className="flexRowCenter">
-                <Typography variant="h5">{formData.formulario}</Typography>
-              </Box>
-              <Box className="flexRowStart" sx={{ gap: 10 }}></Box>
-              <Box className="flexRowCenter" gap={1}></Box>
-            </Box>
-            <Divider />
-          </Box>
-          <Box>
+    <>
+      <Dialog fullScreen={mobile} open={resDialogOpen} onClose={handleClose}>
+        <DialogTitle>Respostas</DialogTitle>
+        <DialogContent>
+          <Grid2 mt={1} container spacing={2}>
             {formData?.questoes &&
-              formData.questoes.map((item) => (
-                <OutlinedBox key={item.questao.id} sx={{ mt: 3 }}>
-                  <Box>
-                    <Typography sx={{ mb: 3 }} variant="h6">
-                      {item.questao.titulo}
-                    </Typography>
-                  </Box>
-                  {item.respostas &&
-                    getRespostas(item.respostas, item.questao.tipo)}
-                  {item.respostas.length === 0 && (
-                    <Typography>Não há respostas</Typography>
-                  )}
-                </OutlinedBox>
-              ))}
+              formData.questoes.map((item, index) => {
+                let resposta = resAtual ? resAtual[item.id] || [] : [];
+
+                if (item.tipo === "DATE")
+                  resposta = dayjs(resposta).format("DD/MM/YYYY");
+
+                return (
+                  <ColumnTextField
+                    id={item.id}
+                    key={index}
+                    label={item.titulo}
+                    value={resposta}
+                  />
+                );
+              })}
+          </Grid2>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="secondary">
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <PageModal>
+        <Backdrop
+          open={loading}
+          sx={(theme) => ({ zIndex: theme.zIndex.drawer + 2 })}
+        >
+          <CircularProgress />
+        </Backdrop>
+        {!loading && (
+          <Box mb={1} className="flexRowBetween">
+            <Box className="flexRowCenter" gap={1}>
+              <ButtonBase
+                onClick={() => {
+                  navigate("/formularios");
+                }}
+                disableRipple
+                sx={{ borderRadius: "50%", p: "8px" }}
+              >
+                <ArrowBackIosIcon fontSize="32px" />
+              </ButtonBase>
+              <Typography variant="h6">Formulário</Typography>
+            </Box>
           </Box>
-        </>
-      )}
-    </PageModal>
+        )}
+        {!loading && formData && (
+          <>
+            <Box
+              sx={(theme) => ({
+                position: "sticky",
+                top: -16,
+                zIndex: theme.zIndex.drawer - 1,
+                bgcolor: "#ffffff",
+              })}
+            >
+              <Box
+                mb={3}
+                p={1}
+                className="flexRowBetween"
+                sx={{ alignItems: "flex-end" }}
+              >
+                <Box className="flexRowCenter">
+                  <Typography variant="h5">{formData.formulario}</Typography>
+                </Box>
+                <Box className="flexRowStart" sx={{ gap: 10 }}></Box>
+                <Box className="flexRowCenter" gap={1}></Box>
+              </Box>
+              <Divider />
+              <Guias />
+              <Divider />
+            </Box>
+            {actualTab && actualTab === "visaoGeral" && (
+              <Box>
+                {formData?.data &&
+                  formData.data.map((item) => (
+                    <OutlinedBox key={item.questao.id} sx={{ mt: 3 }}>
+                      <Box>
+                        <Typography sx={{ mb: 3 }} variant="h6">
+                          {item.questao.titulo}
+                        </Typography>
+                      </Box>
+                      {item.respostas &&
+                        getRespostas(item.respostas, item.questao.tipo)}
+                      {item.respostas.length === 0 && (
+                        <Typography>Não há respostas</Typography>
+                      )}
+                    </OutlinedBox>
+                  ))}
+              </Box>
+            )}
+            {actualTab && actualTab === "respostas" && (
+              <Box>
+                {formData?.respostas &&
+                  formData.respostas.map((resposta, index) => (
+                    <Box key={resposta.id} sx={{ mt: 3 }}>
+                      <Box
+                        sx={{
+                          bgcolor: "#fafafa",
+                          p: 2,
+                          borderRadius: 2,
+                          my: 1,
+                          display: "flex",
+                          gap: 2,
+                        }}
+                      >
+                        <Typography>{index + 1}</Typography>
+                        <Divider
+                          orientation="vertical"
+                          flexItem
+                          sx={{
+                            backgroundColor: "#dcdcdc",
+                          }}
+                        />
+                        {resposta.email && (
+                          <>
+                            <Typography
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ")
+                                  handleClick(resposta);
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              sx={{
+                                cursor: "pointer",
+                                "&:hover": { textDecoration: "underline" },
+                              }}
+                              onClick={() => handleClick(resposta)}
+                            >
+                              {resposta.email}
+                            </Typography>
+                            <Typography sx={{ ml: "auto" }}>
+                              {dayjs(resposta.horarioEnviado).format(
+                                "DD/MM/YYYY HH:mm"
+                              )}
+                            </Typography>
+                          </>
+                        )}
+                        {!resposta.email && (
+                          <>
+                            <Typography
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ")
+                                  handleClick(resposta);
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              sx={{
+                                cursor: "pointer",
+                                "&:hover": { textDecoration: "underline" },
+                              }}
+                              onClick={() => handleClick(resposta)}
+                            >
+                              {dayjs(resposta.horarioEnviado).format(
+                                "DD/MM/YYYY HH:mm"
+                              )}
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
+                    </Box>
+                  ))}
+              </Box>
+            )}
+          </>
+        )}
+      </PageModal>
+    </>
+  );
+};
+
+const Guias = () => {
+  const theme = useTheme();
+  const { mobile } = useLayout();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const actualTab = searchParams.get("tab");
+
+  return (
+    <Box className="flexRowBetween">
+      <Box
+        mt={8}
+        sx={{
+          display: "grid",
+          gridTemplateColumns: `repeat(2, 1fr)`,
+          width: mobile ? "100%" : "30%",
+        }}
+        gap={5}
+      >
+        <ButtonBase
+          disableRipple
+          onClick={() => {
+            setSearchParams({ tab: "visaoGeral" });
+          }}
+          sx={{
+            borderBottom: `2px solid ${
+              "visaoGeral" === actualTab ? theme.palette.secondary.main : null
+            }`,
+            pb: "4px",
+          }}
+        >
+          <Typography>Visão geral</Typography>
+        </ButtonBase>
+        <ButtonBase
+          disableRipple
+          onClick={() => {
+            setSearchParams({ tab: "respostas" });
+          }}
+          sx={{
+            borderBottom: `2px solid ${
+              "respostas" === actualTab ? theme.palette.secondary.main : null
+            }`,
+            pb: "4px",
+          }}
+        >
+          <Typography>Respostas</Typography>
+        </ButtonBase>
+      </Box>
+    </Box>
   );
 };
 
