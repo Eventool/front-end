@@ -12,14 +12,25 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MudarVisualizacao from "../components/mudarVisualizacao/MudarVisualizacao";
+import { fetchData } from "../services/DataService";
+import { useAlerta } from "../context/AlertaContext";
+import { useNavigate } from "react-router-dom";
 
-const Parceiros = ({ setTitulo, setActions }) => {
+import dayjs from "dayjs";
+import { useLayout } from "../layouts/Layout";
+
+const Parceiros = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Parceiros");
     setActions(null);
   }, []);
 
+  const alerta = useAlerta();
+
   const [usuarios, setUsuarios] = useState([]);
+  const [usuariosData, setUsuariosData] = useState([]);
   const [nomePesquisado, setNomePesquisado] = useState("");
 
   const handleSearchChange = (e) => {
@@ -27,12 +38,25 @@ const Parceiros = ({ setTitulo, setActions }) => {
   };
 
   useEffect(() => {
+    (async () => {
+      const response = await fetchData("usuarios");
+
+      if (response.error) {
+        alerta.error("Não foi possível buscar usuários");
+        return;
+      }
+
+      setUsuariosData(response);
+    })();
+  }, [setUsuariosData]);
+
+  useEffect(() => {
     setUsuarios(
-      getUsuarios.filter((user) =>
-        user.nome.toLowerCase().includes(nomePesquisado.toLowerCase())
+      usuariosData.filter((user) =>
+        user.contato.nome.toLowerCase().includes(nomePesquisado.toLowerCase())
       )
     );
-  }, [setUsuarios, nomePesquisado]);
+  }, [setUsuarios, nomePesquisado, usuariosData]);
 
   return (
     <>
@@ -63,30 +87,40 @@ const Parceiros = ({ setTitulo, setActions }) => {
 
 const CardUsuario = (usuario) => {
   const user = usuario.usuario;
+  const navigate = useNavigate();
 
   return (
     <Card>
       <CardActionArea>
-        <CardMedia component="img" height={140} image={user.imagem} />
-        <CardContent>
+        <CardMedia
+          component="img"
+          height={140}
+          image="https://via.placeholder.com/150"
+        />
+        <CardContent onClick={() => navigate("/usuarios/" + user.id)}>
           <Box
             className="flexColumn"
             sx={{ alignItems: "center", justifyContent: "center" }}
           >
             <Typography gutterBottom variant="h6" component="div">
-              {user.nome}
+              {user.contato.nome}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {user.idade} anos
+              {dayjs().diff(dayjs(user.contato.dataNascimento), "year")} anos
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {user.local}
+              {user.email}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {user.cidade}
+              {user?.contato?.celular
+                ? user.contato.celular.replace(
+                    /(\d{2})(\d{5})(\d{4})/,
+                    "($1) $2-$3"
+                  )
+                : "Número indisponível"}
             </Typography>
             <Stack mt={2}>
-              <Rating defaultValue={user.avaliacao} precision={0.5} readOnly />
+              <Rating defaultValue={4} precision={0.5} readOnly />
             </Stack>
           </Box>
         </CardContent>

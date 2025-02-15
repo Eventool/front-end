@@ -2,7 +2,12 @@ import { Box, Button } from "@mui/material";
 import Botao from "./Botao";
 import { useCollapsed } from "../../context/CollapsedContext";
 
-const FloatingBotao = ({ handleSalvar, handleCancelar }) => {
+const FloatingBotao = ({
+  handleSalvar,
+  handleCancelar,
+  podeAvancar,
+  buttons,
+}) => {
   const { collapsed } = useCollapsed();
 
   return (
@@ -22,13 +27,29 @@ const FloatingBotao = ({ handleSalvar, handleCancelar }) => {
         gap: 1,
       }}
     >
-      <Botao
+      {/* <Botao
         onClick={handleCancelar}
         variant="outlined"
         color="primary"
         txt="Cancelar"
       />
-      <Botao onClick={handleSalvar} txt="Salvar" />
+
+      
+      <Botao onClick={handleSalvar} txt="Salvar" disabled={podeAvancar} /> */}
+      {buttons &&
+        buttons.map((item, index) => {
+          return (
+            <Botao
+              key={index}
+              onClick={item.action}
+              variant={item.variant}
+              color={item.color}
+              txt={item.label}
+              icon={item.icon}
+              disabled={item.disabled}
+            />
+          );
+        })}
     </Box>
   );
 };

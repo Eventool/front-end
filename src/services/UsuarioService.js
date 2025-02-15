@@ -1,9 +1,10 @@
 import axios from "axios";
 import { urlData } from "./DataService";
+import Cookies from 'js-cookie';
 
 export const logar = async (dados) => {
   try {
-    const response = await axios.post("http://localhost:8080/usuarios/login", {
+    const response = await axios.post(urlData + "usuarios/login", {
       email: dados.email,
       senha: dados.senha,
     });
@@ -11,15 +12,15 @@ export const logar = async (dados) => {
     if (response.status !== 200) return;
 
     const { token, id, tipoUsuario, contato } = response.data;
-
-    sessionStorage.setItem("TOKEN", token);
-    sessionStorage.setItem("ID", id);
-    sessionStorage.setItem("tipoUsuario", tipoUsuario);
-    sessionStorage.setItem("nome", contato.nome);
+    
+    Cookies.set('TOKEN', token);
+    Cookies.set("ID", id);
+    Cookies.set("tipoUsuario", tipoUsuario);
+    Cookies.set("nome", contato.nome);
 
     return response.data; 
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };
 

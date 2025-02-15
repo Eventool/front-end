@@ -60,7 +60,12 @@ export const aplicarMascara = (valor, mascara) => {
         .reverse()
         .join("");
         /* :( */
+      break;
 
+    case "numero":
+      valorNovo = valorNovo.replace(/\D/g, "");
+      valorNovo = (valorNovo / 100)
+        .toFixed(2)
       break;
     case "dataNascimento": {
       if (!valorNovo.includes("-")) break;
@@ -135,3 +140,39 @@ export const numToMes = (n) => {
       break;
   }
 };
+
+export const getNestedValue = (obj, path) => {
+  const keys = path.split('.');
+  
+  return keys.reduce((current, key) => {
+    return current && current[key] !== undefined ? current[key] : undefined;
+  }, obj);
+}
+
+export const updateNestedState = (obj, path, value) => {
+  const keys = path.split('.');
+  const updatedObject = { ...obj };
+  let currentLevel = updatedObject;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!currentLevel[key]) {
+      currentLevel[key] = {};
+    }
+    currentLevel = currentLevel[key];
+  }
+
+  currentLevel[keys[keys.length - 1]] = value;
+  return updatedObject;
+};
+
+export const formatCurrency = (value) => {
+  return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+  }).format(value);
+}
+
+export const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
+
+export const guestPages = ["/login", "/cadastro"];

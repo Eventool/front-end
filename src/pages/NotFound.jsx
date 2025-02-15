@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
+import { useLayout } from "../layouts/Layout";
 
-const NotFound = ({ setTitulo, setActions }) => {
+const NotFound = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Página não encontrada.");
     setActions(null);

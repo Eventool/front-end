@@ -1,11 +1,12 @@
 import axios from "axios";
-import { urlData } from "./DataService";
+import { postData, urlData } from "./DataService";
+import Cookies from 'js-cookie';
 
 export const buscarEventos = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/eventos", {
+    const response = await axios.get(urlData + "eventos", {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -13,26 +14,18 @@ export const buscarEventos = async () => {
 
     return response.data;
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };
 
-// TODO: Otimizar a criação do evento em um único post
 export const postEvento = async (request, imgRequest) => {
   request.orcamento = request.orcamento.replaceAll(".", "").replace(",", ".");
-  try {
-    const response = await axios.post(urlData + "eventos", request, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
-      },
-    });
 
-    await patchImgEvento(imgRequest, response.data.id);
-
-    return response;
-  } catch (err) {
-    console.log(err.response.status);
-  }
+  const formData = new FormData();
+  formData.append('data', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+  formData.append('file', imgRequest);
+  
+  return await postData('eventos', formData);
 };
 
 export const patchImgEvento = async (request, id) => {
@@ -42,7 +35,7 @@ export const patchImgEvento = async (request, id) => {
       request,
       {
         headers: {
-          Authorization: `Bearer ${sessionStorage.TOKEN}`,
+          Authorization: `Bearer ${Cookies.get("TOKEN")}`,
         },
       }
     );
@@ -51,18 +44,17 @@ export const patchImgEvento = async (request, id) => {
 
     return response.data;
   } catch (err) {
-    console.log(err.response.status);
+    //console.log(err.response.status);
   }
 };
 
 export const putEvento = async (request, id) => {
-  console.log(request);
   if (!(typeof request.orcamento === "number"))
     request.orcamento = request.orcamento.replaceAll(".", "").replace(",", ".");
   try {
     const response = await axios.put(urlData + "eventos/" + id, request, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -76,7 +68,7 @@ export const deleteEvento = async (id) => {
   try {
     const response = await axios.delete(urlData + "eventos/" + id, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 

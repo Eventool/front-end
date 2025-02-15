@@ -23,21 +23,23 @@ async function buscarCoordenadas(endereco) {
   }
 }
 
-const Mapa = ({ logradouro, cidade, uf, popup }) => {
+const Mapa = ({ endereco }) => {
   const [coords, setCoords] = useState(null);
   const [erro, setErro] = useState(false);
 
   useEffect(() => {
-    const endereco = `${logradouro}, ${cidade}, ${uf}`;
-    buscarCoordenadas(endereco)
+    const enderecoCoords = `${endereco.logradouro}, ${endereco.cidade}, ${endereco.uf}`;
+    buscarCoordenadas(enderecoCoords)
       .then((coordenadas) => {
         setCoords(coordenadas);
       })
-      .catch((err) => {
-        console.error("Erro ao buscar coordenadas:", err);
+      .catch(() => {
+        console.error(
+          "Erro ao buscar coordenadas no mapa: Endereço informado é inválido."
+        );
         setErro(true);
       });
-  }, [logradouro, cidade, uf]);
+  }, [endereco]);
 
   return (
     <Box
@@ -63,7 +65,7 @@ const Mapa = ({ logradouro, cidade, uf, popup }) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           <Marker position={[coords.latitude, coords.longitude]}>
-            <Popup>{popup}</Popup>
+            <Popup>{endereco.local}</Popup>
           </Marker>
         </MapContainer>
       ) : (

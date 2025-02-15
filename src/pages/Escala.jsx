@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Tabela from "../components/tabela/Tabela";
 import { colaboradores } from "../utils/dataMockUtil";
-import { formatarObjetos } from "../utils/formatarUtil";
+import { formatarObjetos } from "../utils/util";
 import EditIcon from "@mui/icons-material/Edit";
 import { Box, Button, ButtonBase } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -10,11 +10,11 @@ import { DataGrid, GRID_CHECKBOX_SELECTION_COL_DEF } from "@mui/x-data-grid";
 
 const Escala = ({ setTitulo }) => {
   const handleEditClick = (id) => {
-    console.log(id);
+    //console.log(id);
   };
 
   const handleViewClick = (id) => {
-    console.log(id);
+    //console.log(id);
   };
 
   const columns = [

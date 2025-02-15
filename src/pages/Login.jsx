@@ -3,26 +3,39 @@ import { logar } from "../services/UsuarioService";
 import CampoTexto from "../components/input/CampoTexto";
 import Botao from "../components/btn/Botao";
 import axios from "axios";
+import { useAlerta } from "../context/AlertaContext";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Paper,
   Typography,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import imagemFundo from "../assets/Login.png";
-import { Password } from "@mui/icons-material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { emailRegex } from "../utils/util";
+import { useLayout } from "../layouts/Layout";
 
-const Login = ({ setTitulo, setActions }) => {
+const Login = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const { login } = useUser();
   const [dados, setDados] = useState({ email: "", senha: "" });
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   useEffect(() => {
     setTitulo("");
@@ -33,6 +46,8 @@ const Login = ({ setTitulo, setActions }) => {
     setDados({ ...dados, [e.target.name]: e.target.value });
   };
 
+  const alerta = useAlerta();
+
   const handleLogin = async () => {
     setLoading(true);
 
@@ -42,7 +57,10 @@ const Login = ({ setTitulo, setActions }) => {
         login({ tipoUsuario });
         navigate("/");
       } catch (err) {
-        console.log(err);
+        alerta.error(
+          "Erro ao realizar login. Verifique seus dados e tente novamente."
+        );
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -58,36 +76,56 @@ const Login = ({ setTitulo, setActions }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         alignItems: "center",
+        overflow: "auto",
       }}
     >
-      <Paper
+      <Box
         sx={{
-          width: "26%",
-          height: "79%",
-          p: 8,
-          borderRadius: 10,
-          display: "flex",
-          flexDirection: "column",
-          marginLeft: "190px",
-          boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.3)",
+          bgcolor: "#ffffff",
+          width: {
+            xs: "100%",
+            sm: 450,
+          },
+          height: {
+            xs: "100%",
+            sm: 650,
+          },
+
+          left: {
+            xs: 0,
+            sm: 140,
+          },
+          position: {
+            md: "static",
+            lg: "fixed",
+          },
+          p: {
+            xs: 8,
+            sm: 4,
+          },
+          borderRadius: {
+            xs: 0,
+            sm: 3,
+          },
+          boxShadow:
+            "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
         }}
       >
         <Typography
           variant="h5"
           sx={{
+            width: 200,
             fontWeight: "normal",
             mb: 12,
             fontSize: "38px",
             marginRight: "10px",
-            marginTop: "19px",
             ml: 0,
           }}
         >
           <b>Entrar</b> em Seren<span style={{ color: "#f27a0c" }}>it</span>y
         </Typography>
-
         <Typography
           variant="subtitle1"
           sx={{
@@ -104,8 +142,11 @@ const Login = ({ setTitulo, setActions }) => {
           name="email"
           value={dados.email}
           handleChange={handleChange}
+          textSize={{ min: 0, max: 64 }}
           startAdornment={<EmailIcon />}
           borderRadius={"9px"}
+          regex={emailRegex}
+          defaultMessage={"E-mail inválido"}
         />
 
         <Typography
@@ -126,8 +167,14 @@ const Login = ({ setTitulo, setActions }) => {
           name="senha"
           value={dados.senha}
           handleChange={handleChange}
-          type="password"
+          textSize={{ min: 0, max: 128 }}
+          type={showPassword ? "text" : "password"}
           startAdornment={<LockIcon />}
+          endAdornment={
+            <IconButton onClick={togglePasswordVisibility} edge="end">
+              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            </IconButton>
+          }
         />
 
         <Box sx={{ height: "17%" }} mt={4} className="flexRowCenter">
@@ -148,7 +195,7 @@ const Login = ({ setTitulo, setActions }) => {
             <CircularProgress color="secondary" />
           )}
         </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 };

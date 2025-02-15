@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useAlerta } from "../../../context/AlertaContext";
 
 const AbrirInscricoes = ({ dadosEvento }) => {
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const [share, setShare] = useState([]);
   const [shareAtual, setShareAtual] = useState(null);
@@ -67,7 +67,7 @@ const AbrirInscricoes = ({ dadosEvento }) => {
                   <ButtonBase
                     onClick={() => {
                       navigator.clipboard.writeText(dadosEvento.url);
-                      showAlerta("Copiado para a área de transferência");
+                      alerta.success("Copiado para a área de transferência");
                     }}
                     sx={{ borderRadius: "50%", p: 1 }}
                   >

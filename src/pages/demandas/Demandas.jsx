@@ -5,15 +5,18 @@ import { Box, ButtonBase } from "@mui/material";
 import Botao from "../../components/btn/Botao";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate } from "react-router-dom";
-import { formatarCardDemanda } from "../../utils/formatarUtil";
+import { formatarCardDemanda } from "../../utils/util";
 import { getDemandas } from "../../utils/dataMockUtil";
 import MudarVisualizacao from "../../components/mudarVisualizacao/MudarVisualizacao";
 import EditIcon from "@mui/icons-material/Edit";
 import Tabela from "../../components/tabela/Tabela";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { fetchData } from "../../services/DataService";
+import { useLayout } from "../../layouts/Layout";
 
-const Demandas = ({ setTitulo, setActions }) => {
+const Demandas = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const [demandas, setDemandas] = useState([]);
   const [dataDemandas, setDataDemandas] = useState([]);
 
@@ -32,11 +35,11 @@ const Demandas = ({ setTitulo, setActions }) => {
   };
 
   const handleEditClick = (id) => {
-    console.log(id);
+    //console.log(id);
   };
 
   const handleViewClick = (id) => {
-    console.log(id);
+    //console.log(id);
   };
 
   const [visualizacao, setVisualizacao] = useState("cards");
@@ -147,6 +150,7 @@ const Demandas = ({ setTitulo, setActions }) => {
                   titulo={demanda.demanda}
                   date={demanda.date}
                   evento={demanda.evento}
+                  handleClick={() => navigate(`/demandas/${demanda.id}`)}
                 />
               );
             })}

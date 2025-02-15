@@ -1,25 +1,19 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   Box,
   Button,
   ButtonGroup,
   CssBaseline,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "../components/navbar/Navbar";
 import BarraLateral from "../components/sidebar/BarraLateral";
-import DemandasAbertas from "../pages/demandas/DemandasAbertas";
-import DemandasFechadas from "../pages/demandas/DemandasFechadas";
 import Dashboard from "../pages/Dashboard";
 import CriarDemandas from "../pages/demandas/criarDemandas/CriarDemandas";
 import Escala from "../pages/Escala";
-import Formularios from "../pages/Formularios";
+import Formularios from "../pages/formulario/Formularios";
 import Parceiros from "../pages/Parceiros";
 import Breadcrumb from "../components/breadcrumb/Breadcrumb";
 import Home from "../pages/Home";
@@ -27,8 +21,6 @@ import NotFound from "../pages/NotFound";
 import Login from "../pages/Login";
 import Demandas from "../pages/demandas/Demandas";
 import Eventos from "../pages/eventos/Eventos";
-import EventosAbertos from "../pages/eventos/EventosAbertos";
-import EventosFechados from "../pages/eventos/EventosFechados";
 import CriarEvento from "../pages/eventos/criarEventos/CriarEvento";
 import RegistroEvento from "../pages/eventos/RegistroEvento";
 import ConfirmDialog from "../components/dialogo/ConfirmDialog";
@@ -39,36 +31,151 @@ import Convites from "../pages/colaborador/Convites";
 import BuscarEventos from "../pages/colaborador/BuscarEventos";
 import Configuracoes from "../pages/Configuracoes";
 import { useCollapsed } from "../context/CollapsedContext";
+import RegistroDemanda from "../pages/demandas/RegistroDemanda";
+import RegistroFormulario from "../pages/formulario/RegistroFormulario";
+import RegistroConvite from "../pages/colaborador/RegistroConvite";
+import CheckIn from "../pages/CheckIn";
+import ConfirmarAgendamento from "../pages/ConfirmarAgendamento";
+import BottomNav from "../components/bottomNav/BottomNav";
+import { useTheme } from "@emotion/react";
 import Cadastro from "../pages/Cadastro";
+import PaginaUsuario from "../pages/PaginaUsuario";
+import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import CelebrationOutlinedIcon from "@mui/icons-material/CelebrationOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import GroupIcon from "@mui/icons-material/Group";
+import HomeIcon from "@mui/icons-material/Home";
+import MailIcon from "@mui/icons-material/MailOutlined";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import QrCodeIcon from "@mui/icons-material/QrCode";
+import { useUser } from "../context/UserContext";
+import { guestPages } from "../utils/util";
+import GuestRoute from "./GuestRoute";
+
+const LayoutContext = createContext();
+export const useLayout = () => useContext(LayoutContext);
 
 const Layout = () => {
-  // const [collapsed, setCollapsed] = useState(
-  //     JSON.parse(localStorage.getItem('sidebarCollapsed')) || false
-  // );
-
-  // useEffect(() => {
-  //     localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
-  // }, [collapsed]);
-
   const location = useLocation();
 
-  useEffect(() => {}, [location]);
+  const menuItems = {
+    parceiro: [
+      {
+        smallText: false,
+        activePath: "/",
+        icon: <HomeIcon />,
+        linkTo: "/",
+        text: "Home",
+        sx: { mt: 2 },
+      },
+      {
+        smallText: false,
+        activePath: "/dashboard",
+        icon: <DashboardOutlinedIcon />,
+        linkTo: "/dashboard",
+        text: "Dashboard",
+      },
+      {
+        smallText: false,
+        activePath: "/eventos",
+        icon: <CelebrationOutlinedIcon />,
+        linkTo: "/eventos",
+        text: "Eventos",
+      },
+      {
+        smallText: false,
+        activePath: "/demandas",
+        icon: <AssignmentOutlinedIcon />,
+        linkTo: "/demandas",
+        text: "Demandas",
+      },
+      {
+        smallText: false,
+        activePath: "/check-in",
+        icon: <QrCodeIcon />,
+        linkTo: "/check-in",
+        text: "Check in",
+      },
+      {
+        isSubMenu: true,
+        label: "Equipe",
+        icon: <GroupIcon />,
+        items: [
+          {
+            activePath: "/formularios",
+            linkTo: "/formularios",
+            icon: <ArticleOutlinedIcon />,
+            text: "Formulários",
+            theme: "primary.lighter",
+          },
+          {
+            activePath: "/parceiros",
+            linkTo: "/parceiros",
+            icon: <ContactsOutlinedIcon />,
+            text: "Colaboradores",
+            theme: "primary.lighter",
+          },
+        ],
+      },
+    ],
+    colaborador: [
+      {
+        smallText: false,
+        activePath: "/",
+        icon: <HomeIcon />,
+        linkTo: "/",
+        text: "Home",
+        sx: { mt: 2 },
+      },
+      {
+        smallText: false,
+        activePath: "/eventos-confirmados",
+        icon: <CelebrationOutlinedIcon />,
+        linkTo: "/eventos-confirmados",
+        text: "Eventos",
+        theme: "primary.lighter",
+      },
+      {
+        smallText: false,
+        activePath: "/convites",
+        icon: <MailIcon />,
+        linkTo: "/convites",
+        text: "Convites",
+        theme: "primary.lighter",
+      },
+    ],
+  };
 
-  const [titulo, setTitulo] = useState("");
-  const [actions, setActions] = useState([]);
+  const { tipoUsuario } = useUser();
+  const { collapsed } = useCollapsed();
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const showNav = !guestPages.includes(location.pathname) && !!tipoUsuario;
 
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
   const [dialogAction, setDialogAction] = useState(null);
 
+  const [titulo, setTitulo] = useState("");
+  const [actions, setActions] = useState([]);
+
   const toggleDialog = () => {
     setOpenDialog(!openDialog);
   };
 
-  const { collapsed } = useCollapsed();
-
   return (
-    <>
+    <LayoutContext.Provider
+      value={{
+        mobile,
+        toggleDialog,
+        setDialogAction,
+        setDialogContent,
+        setTitulo,
+        setActions,
+      }}
+    >
       <ConfirmDialog
         action={dialogAction}
         content={dialogContent}
@@ -77,41 +184,18 @@ const Layout = () => {
       />
       <Box sx={{ display: "flex", height: "100vh", flexDirection: "column" }}>
         <CssBaseline />
-        {location.pathname !== "/login" &&
-          location.pathname !== "/cadastro" && <Navbar />}
+        {showNav && <Navbar />}
         <div className="app">
-          {location.pathname !== "/login" &&
-            location.pathname !== "/cadastro" && <BarraLateral />}
+          {showNav && !mobile && <BarraLateral menuItems={menuItems} />}
           <Box
             sx={{
-              overflow:
-                location.pathname !== "/login" &&
-                location.pathname !== "/cadastro"
-                  ? "scroll"
-                  : "hidden",
+              overflow: showNav ? "scroll" : "hidden",
             }}
-            p={
-              location.pathname !== "/login" &&
-              location.pathname !== "/cadastro"
-                ? 2
-                : 0
-            }
+            p={showNav ? 2 : 0}
             style={{
-              left: `${
-                location.pathname !== "/login" &&
-                location.pathname !== "/cadastro"
-                  ? collapsed
-                    ? 80
-                    : 260
-                  : 0
-              }px`,
+              left: `${!mobile && showNav ? (collapsed ? 80 : 260) : 0}px`,
               width: `calc(100% - ${
-                location.pathname !== "/login" &&
-                location.pathname !== "/cadastro"
-                  ? collapsed
-                    ? 80
-                    : 260
-                  : 0
+                !mobile && showNav ? (collapsed ? 80 : 260) : 0
               }px)`,
               bgcolor: "#f0f0f0",
             }}
@@ -124,224 +208,87 @@ const Layout = () => {
                   justifyContent={"space-between"}
                   alignItems={"flex-end"}
                 >
-                  <Typography variant="h4" component="h4">
-                    {titulo}
-                  </Typography>
+                  <Typography variant="h4">{titulo}</Typography>
                   <ButtonGroup variant="contained" color="secondary">
                     {actions &&
-                      actions.map((action, index) => {
-                        return (
-                          <Button
-                            startIcon={action.icon}
-                            key={index}
-                            onClick={action.handleClick}
-                          >
-                            {action.label}
-                          </Button>
-                        );
-                      })}
+                      actions.map((action, index) => (
+                        <Button
+                          startIcon={action.icon}
+                          key={index}
+                          onClick={action.handleClick}
+                          disabled={action.isLoading}
+                        >
+                          {action.label}
+                        </Button>
+                      ))}
                   </ButtonGroup>
                 </Box>
                 <Breadcrumb />
               </Box>
             )}
             <Routes>
-              <Route
-                path="/login"
-                element={
-                  <Login setTitulo={setTitulo} setActions={setActions} />
-                }
-              />
-              <Route
-                path="/cadastro"
-                element={
-                  <Cadastro setTitulo={setTitulo} setActions={setActions} />
-                }
-              />
+              <Route element={<GuestRoute />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/cadastro" element={<Cadastro />} />
+              </Route>
               <Route
                 element={
                   <ProtectedRoute allowedTypes={["parceiro", "colaborador"]} />
                 }
               >
-                <Route
-                  path="/"
-                  element={
-                    <Home setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/configuracoes"
-                  element={
-                    <Configuracoes
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
+                <Route path="/" element={<Home />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
               </Route>
-
               <Route element={<ProtectedRoute allowedTypes={["parceiro"]} />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/eventos" element={<Eventos />} />
+                <Route path="/check-in" element={<CheckIn />} />
                 <Route
-                  path="/"
-                  element={
-                    <Home setTitulo={setTitulo} setActions={setActions} />
-                  }
+                  path="/check-in/:agendamentoId"
+                  element={<ConfirmarAgendamento />}
                 />
+                <Route path="/eventos/:recordId" element={<RegistroEvento />} />
                 <Route
-                  path="/dashboard"
-                  element={
-                    <Dashboard setTitulo={setTitulo} setActions={setActions} />
-                  }
+                  path="/demandas/:recordId"
+                  element={<RegistroDemanda />}
                 />
+                <Route path="/usuarios/:userId" element={<PaginaUsuario />} />
+                <Route path="/eventos/criar" element={<CriarEvento />} />
+                <Route path="/demandas" element={<Demandas />} />
+                <Route path="/demandas/criar" element={<CriarDemandas />} />
+                <Route path="/escala" element={<Escala />} />
+                <Route path="/formularios" element={<Formularios />} />
                 <Route
-                  path="/eventos"
-                  element={
-                    <Eventos setTitulo={setTitulo} setActions={setActions} />
-                  }
+                  path="/formularios/:recordId"
+                  element={<RegistroFormulario />}
                 />
-                <Route
-                  path="/eventos/:eventId"
-                  element={
-                    <RegistroEvento
-                      toggleDialog={toggleDialog}
-                      setDialogAction={setDialogAction}
-                      setDialogContent={setDialogContent}
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/eventos/criar"
-                  element={
-                    <CriarEvento
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/eventos-abertos"
-                  element={
-                    <EventosAbertos
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/eventos-fechados"
-                  element={
-                    <EventosFechados
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/demandas"
-                  element={
-                    <Demandas setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/demandas/criar"
-                  element={
-                    <CriarDemandas
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/demandas-abertas"
-                  element={
-                    <DemandasAbertas
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/demandas-fechadas"
-                  element={
-                    <DemandasFechadas
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/escala"
-                  element={
-                    <Escala setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="/formularios"
-                  element={
-                    <Formularios
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/parceiros"
-                  element={
-                    <Parceiros setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
-                <Route
-                  path="*"
-                  element={
-                    <NotFound setTitulo={setTitulo} setActions={setActions} />
-                  }
-                />
+                <Route path="/parceiros" element={<Parceiros />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
-
               <Route
                 element={<ProtectedRoute allowedTypes={["colaborador"]} />}
               >
                 <Route
                   path="/eventos-confirmados"
-                  element={
-                    <EventosConfirmados
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<EventosConfirmados />}
                 />
                 <Route
                   path="/eventos-pendentes"
-                  element={
-                    <EventosPendentes
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
+                  element={<EventosPendentes />}
                 />
+                <Route path="/eventos/buscar" element={<BuscarEventos />} />
+                <Route path="/convites" element={<Convites />} />
                 <Route
-                  path="/eventos/buscar"
-                  element={
-                    <BuscarEventos
-                      setTitulo={setTitulo}
-                      setActions={setActions}
-                    />
-                  }
-                />
-                <Route
-                  path="/convites"
-                  element={
-                    <Convites setTitulo={setTitulo} setActions={setActions} />
-                  }
+                  path="/convites/:recordId"
+                  element={<RegistroConvite />}
                 />
               </Route>
             </Routes>
           </Box>
         </div>
+        {showNav && mobile && <BottomNav menuItems={menuItems} />}
       </Box>
-    </>
+    </LayoutContext.Provider>
   );
 };
 

@@ -5,20 +5,26 @@ import CampoTexto from "../../../components/input/CampoTexto";
 import Botao from "../../../components/btn/Botao";
 import PillContainer from "../../../components/pill/Pill";
 import { funcoesAlocacao } from "../../../utils/dataMockUtil";
-import { useState } from "react";
-import { useTheme } from "@emotion/react";
+import { useEffect, useState } from "react";
 import OutlinedBox from "../../../components/box/OutlinedBox";
 
-const CadastrarEscalas = ({
+const CriarEscalas = ({
   dadosDemanda,
   setDadosDemanda,
   adicionarEscala,
+  handleErros,
+  erros,
 }) => {
-  const theme = useTheme();
-
   const setEscalas = (escala) => {
     setDadosDemanda({ ...dadosDemanda, escalas: escala });
   };
+
+  useEffect(() => {
+    handleErros({
+      name: "escalas",
+      value: dadosDemanda.escalas?.length === 0,
+    });
+  }, [dadosDemanda]);
 
   const [escalaAtual, setEscalaAtual] = useState({
     funcao: {
@@ -26,7 +32,7 @@ const CadastrarEscalas = ({
       value: "",
     },
     qtdColaborador: "",
-    qtdHora: "",
+    horasJornada: "",
     valor: "",
   });
 
@@ -46,7 +52,7 @@ const CadastrarEscalas = ({
       id: escalas.length > 0 ? escalas[escalas.length - 1].id + 1 : 0,
       funcao: escalaAtual.funcao,
       qtdColaborador: escalaAtual.qtdColaborador,
-      qtdHora: escalaAtual.qtdHora,
+      horasJornada: escalaAtual.horasJornada,
       valor: escalaAtual.valor,
     };
 
@@ -59,15 +65,20 @@ const CadastrarEscalas = ({
     adicionarEscala(novaEscala);
 
     setEscalaAtual({
-      funcao: {
-        id: "",
-        value: "",
-      },
+      funcao: {},
       qtdColaborador: "",
-      qtdHora: "",
+      horasJornada: "",
       valor: "",
     });
   };
+
+  const [podeAvancar, setAvancar] = useState(true);
+
+  useEffect(() => {
+    const { funcao, qtdColaborador, horasJornada, valor } = escalaAtual;
+
+    setAvancar(!funcao.value || !qtdColaborador || !horasJornada || !valor);
+  }, [escalaAtual]);
 
   return (
     <>
@@ -104,14 +115,16 @@ const CadastrarEscalas = ({
             name="qtdColaborador"
             value={escalaAtual.qtdColaborador}
             label="Qtd Colaboradores"
+            textSize={{ min: 0, max: 48 }}
           />
           <CampoTexto
             size={12}
             handleChange={handleChange}
             mascara="numeroPositivo"
-            name="qtdHora"
-            value={escalaAtual.qtdHora}
-            label="Qtd Horas"
+            name="horasJornada"
+            value={escalaAtual.horasJornada}
+            label="Horas da Jornada"
+            textSize={{ min: 0, max: 48 }}
           />
           <CampoTexto
             size={12}
@@ -120,12 +133,14 @@ const CadastrarEscalas = ({
             name="valor"
             value={escalaAtual.valor}
             startAdornment="R$"
+            textSize={{ min: 0, max: 48 }}
             label="Valor"
           />
           <Botao
             sx={{ mt: 2 }}
             txt="Inserir Escala"
             onClick={cadastrarEscala}
+            disabled={!!podeAvancar}
           />
         </FormControl>
       </Grid>
@@ -147,4 +162,4 @@ const CadastrarEscalas = ({
   );
 };
 
-export default CadastrarEscalas;
+export default CriarEscalas;

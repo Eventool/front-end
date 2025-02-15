@@ -1,6 +1,8 @@
 import { Box } from "@mui/material";
 
 const Imagem = ({ imagem, placeholder }) => {
+  //console.log("imagem");
+  //console.log(imagem);
   return (
     <Box
       component="img"

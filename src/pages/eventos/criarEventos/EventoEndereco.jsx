@@ -2,41 +2,15 @@ import { Typography, TextField, Autocomplete, Grid2 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import CampoTexto from "../../../components/input/CampoTexto";
 import axios from "axios";
-
-const estados = [
-  { id: "AC", value: "Acre" },
-  { id: "AL", value: "Alagoas" },
-  { id: "AP", value: "Amapá" },
-  { id: "AM", value: "Amazonas" },
-  { id: "BA", value: "Bahia" },
-  { id: "CE", value: "Ceará" },
-  { id: "DF", value: "Distrito Federal" },
-  { id: "ES", value: "Espírito Santo" },
-  { id: "GO", value: "Goiás" },
-  { id: "MA", value: "Maranhão" },
-  { id: "MT", value: "Mato Grosso" },
-  { id: "MS", value: "Mato Grosso do Sul" },
-  { id: "MG", value: "Minas Gerais" },
-  { id: "PA", value: "Pará" },
-  { id: "PB", value: "Paraíba" },
-  { id: "PR", value: "Paraná" },
-  { id: "PE", value: "Pernambuco" },
-  { id: "PI", value: "Piauí" },
-  { id: "RJ", value: "Rio de Janeiro" },
-  { id: "RN", value: "Rio Grande do Norte" },
-  { id: "RS", value: "Rio Grande do Sul" },
-  { id: "RR", value: "Roraima" },
-  { id: "SC", value: "Santa Catarina" },
-  { id: "SP", value: "São Paulo" },
-  { id: "SE", value: "Sergipe" },
-  { id: "TO", value: "Tocantins" },
-];
+import { estados } from "../../../utils/dataMockUtil";
+import { useEffect, useRef } from "react";
 
 const EventoEndereco = ({
   handleEnderecoChange,
   handleUfChange,
   dadosEvento,
   handleViaCEPResponse,
+  handleErros,
 }) => {
   const handleViaCEP = async (e, name) => {
     handleEnderecoChange(e, name);
@@ -58,6 +32,12 @@ const EventoEndereco = ({
     handleViaCEPResponse(enderecoChange);
   };
 
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <>
       <Grid
@@ -74,15 +54,27 @@ const EventoEndereco = ({
       </Grid>
       <Grid width="80%" margin="auto" container columnSpacing={2}>
         <CampoTexto
+          required
+          size={12}
+          handleChange={handleEnderecoChange}
+          value={dadosEvento.endereco?.local}
+          handleErros={handleErros}
+          name="local"
+          label="Local"
+          inputRef={inputRef}
+        />
+        <CampoTexto
           size={12}
           handleChange={handleEnderecoChange}
           value={dadosEvento.endereco?.logradouro}
+          handleErros={handleErros}
           name="logradouro"
           label="Logradouro"
         />
         <CampoTexto
           handleChange={handleViaCEP}
           value={dadosEvento.endereco?.cep}
+          handleErros={handleErros}
           name="cep"
           mascara="cep"
           regex={/^\d{5}-\d{3}$/}
@@ -91,13 +83,16 @@ const EventoEndereco = ({
         <CampoTexto
           handleChange={handleEnderecoChange}
           value={dadosEvento.endereco?.numero}
+          handleErros={handleErros}
           mascara="numeroPositivo"
           name="numero"
+          textSize={{ min: 0, max: 12 }}
           label="Número"
         />
         <CampoTexto
           handleChange={handleEnderecoChange}
           value={dadosEvento.endereco?.cidade}
+          handleErros={handleErros}
           name="cidade"
           label="Cidade"
         />

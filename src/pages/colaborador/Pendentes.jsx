@@ -1,6 +1,9 @@
 import { useEffect } from "react";
+import { useLayout } from "../../layouts/Layout";
 
-const EventosPendentes = ({ setTitulo, setActions }) => {
+const EventosPendentes = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Eventos pendentes");
     setActions(null);

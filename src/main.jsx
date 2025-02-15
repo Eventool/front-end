@@ -50,7 +50,7 @@ const theme = createTheme({
       containerBackground: "#00000000",
     },
   },
-  // ptBR
+  ptBR,
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -58,7 +58,10 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <Box sx={{ bgcolor: "paper.main" }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={ptBR}>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale={"pt-br"}
+        >
           <App />
         </LocalizationProvider>
       </Box>

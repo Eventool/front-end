@@ -6,7 +6,7 @@ import Botao from "../../components/btn/Botao";
 import CreateIcon from "@mui/icons-material/Create";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buscarEventos } from "../../services/EventoService";
-import { numToMes } from "../../utils/formatarUtil";
+import { numToMes } from "../../utils/util";
 import dayjs from "dayjs";
 import defaultimg from "../../assets/evento-card-bg.png";
 import MudarVisualizacao from "../../components/mudarVisualizacao/MudarVisualizacao";
@@ -20,8 +20,11 @@ import {
   fetchData,
   fetchParamsData,
 } from "../../services/DataService";
+import { useLayout } from "../../layouts/Layout";
 
-const Eventos = ({ setTitulo, setActions }) => {
+const Eventos = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const status = queryParams.get("status");

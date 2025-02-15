@@ -1,6 +1,9 @@
 import { useEffect } from "react";
+import { useLayout } from "../../layouts/Layout";
 
-const BuscarEventos = ({ setTitulo, setActions }) => {
+const BuscarEventos = () => {
+  const { setTitulo, setActions } = useLayout();
+
   useEffect(() => {
     setTitulo("Buscar eventos");
     setActions(null);

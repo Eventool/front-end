@@ -1,11 +1,11 @@
 import axios from "axios";
-import { useAlerta } from "../context/AlertaContext";
+import Cookies from 'js-cookie';
 
 export const fetchData = async (resource) => {
   try {
     const response = await axios.get(urlData + resource, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -24,7 +24,7 @@ export const fetchParamsData = async (resource, params) => {
   try {
     const response = await axios.get(urlData + resource, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
       params: params
     });
@@ -44,7 +44,7 @@ export const postData = async (resource, request) => {
   try {
     const response = await axios.post(urlData + resource, request, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
@@ -63,13 +63,78 @@ export const putData = async (resource, request, id) => {
   try {
     const response = await axios.put(`${urlData}${resource}/${id}`, request, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
     });
 
-    return response;
+    return response.data;
   } catch (err) {
-    console.error(err.response.data);
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
+  }
+};
+
+export const patchData = async (resource, id, action) => {
+  try {
+    const response = await axios.patch(`${urlData}${resource}/${id}/${action}`, {}, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
+      },
+    });
+
+
+    return response.data;
+  } catch (err) {
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
+  }
+};
+
+export const patchParamsData = async (resource, params) => {
+  try {
+    const response = await axios.patch(`${urlData}${resource}`, {}, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
+      },
+      params: params
+    });
+
+
+    return response.data;
+  } catch (err) {
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
+  }
+};
+
+export const deleteData = async (resource, id) => {
+  try {
+    const response = await axios.delete(`${urlData}${resource}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
+      },
+    });
+
+    return response.data;
+  } catch (err) {
+    return {
+      error: true,
+      message: err.response.data.message,
+      data: err.response.data,
+      status: err.response.status,
+    };
   }
 };
 
@@ -77,7 +142,7 @@ export const exportData = async (resource, params) => {
   try {
     const response = await axios.post(`${urlData}${resource}/export`, null, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.TOKEN}`,
+        Authorization: `Bearer ${Cookies.get("TOKEN")}`,
       },
       params: params,
       responseType: "blob",
@@ -101,4 +166,4 @@ export const exportData = async (resource, params) => {
   }
 };
 
-export const urlData = "http://localhost:8080/";
+export const urlData = "http://localhost:8080/api/";

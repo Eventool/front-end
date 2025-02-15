@@ -258,60 +258,7 @@ export const getUsuarios = [
 ];
 
 export const getDemandas = [
-  {
-    id: 0,
-    nome: "Demanda A",
-    inicio: "2024-10-11",
-    fim: "2024-10-21",
-    custoTotal: 20000.0,
-    tipoContrato: "Freelancer",
-    evento: "Evento A",
-  },
-  {
-    id: 1,
-    nome: "Demanda B",
-    inicio: "2024-10-12",
-    fim: "2024-10-22",
-    custoTotal: 30000.0,
-    tipoContrato: "Contrato intermitente",
-    evento: "Evento A",
-  },
-  {
-    id: 2,
-    nome: "Demanda C",
-    inicio: "2024-10-13",
-    fim: "2024-10-23",
-    custoTotal: 40000.0,
-    tipoContrato: "Contrato temporário",
-    evento: "Evento B",
-  },
-  {
-    id: 3,
-    nome: "Demanda D",
-    inicio: "2024-10-14",
-    fim: "2024-10-24",
-    custoTotal: 50000.0,
-    tipoContrato: "Terceirizado",
-    evento: "Evento B",
-  },
-  {
-    id: 4,
-    nome: "Demanda E",
-    inicio: "2024-10-15",
-    fim: "2024-10-25",
-    custoTotal: 60000.0,
-    tipoContrato: "Freelancer",
-    evento: "Evento B",
-  },
-  {
-    id: 5,
-    nome: "Demanda F",
-    inicio: "2024-10-16",
-    fim: "2024-10-26",
-    custoTotal: 70000.0,
-    tipoContrato: "Contrato temporário",
-    evento: "Evento C",
-  },
+  
 ];
 
 export const getEventos = [
@@ -355,4 +302,34 @@ export const getEventos = [
     orcamento: 50000.0,
     logradouro: "Avenida das Ameixeiras",
   },
+];
+
+
+export const estados = [
+  { id: "AC", value: "Acre" },
+  { id: "AL", value: "Alagoas" },
+  { id: "AP", value: "Amapá" },
+  { id: "AM", value: "Amazonas" },
+  { id: "BA", value: "Bahia" },
+  { id: "CE", value: "Ceará" },
+  { id: "DF", value: "Distrito Federal" },
+  { id: "ES", value: "Espírito Santo" },
+  { id: "GO", value: "Goiás" },
+  { id: "MA", value: "Maranhão" },
+  { id: "MT", value: "Mato Grosso" },
+  { id: "MS", value: "Mato Grosso do Sul" },
+  { id: "MG", value: "Minas Gerais" },
+  { id: "PA", value: "Pará" },
+  { id: "PB", value: "Paraíba" },
+  { id: "PR", value: "Paraná" },
+  { id: "PE", value: "Pernambuco" },
+  { id: "PI", value: "Piauí" },
+  { id: "RJ", value: "Rio de Janeiro" },
+  { id: "RN", value: "Rio Grande do Norte" },
+  { id: "RS", value: "Rio Grande do Sul" },
+  { id: "RR", value: "Roraima" },
+  { id: "SC", value: "Santa Catarina" },
+  { id: "SP", value: "São Paulo" },
+  { id: "SE", value: "Sergipe" },
+  { id: "TO", value: "Tocantins" },
 ];

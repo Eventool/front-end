@@ -9,16 +9,22 @@ import DadosEvento from "./DadosEvento";
 import EventoEndereco from "./EventoEndereco";
 import AbrirInscricoes from "./AbrirInscricoes";
 import Finalizar from "./Finalizar";
-import { getFormularios } from "../../../utils/dataMockUtil";
 import { postEvento } from "../../../services/EventoService";
-import BlockIcon from "@mui/icons-material/Block";
-import axios from "axios";
 import { fetchData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
+import dayjs from "dayjs";
+import { useLayout } from "../../../layouts/Layout";
 
-const CriarEvento = ({ setTitulo, setActions }) => {
+const CriarEvento = () => {
+  const { setTitulo, setActions } = useLayout();
+
+  useEffect(() => {
+    setTitulo("");
+    setActions(null);
+  });
+
   const navigate = useNavigate();
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const [step, setStep] = useState(0);
   const labels = ["Evento", "Endereço", "Finalizar"];
@@ -43,22 +49,20 @@ const CriarEvento = ({ setTitulo, setActions }) => {
       idResponsavel: dadosEvento.responsavel?.id,
     };
 
-    const formData = new FormData();
-    formData.append("img", imagem);
-
     try {
-      const { status } = await postEvento(request, formData);
+      const response = await postEvento(request, imagem);
+      [];
 
-      if (status !== 201) {
-        showAlerta("Não foi possível criar evento", "error");
+      if (response.error) {
+        alerta.error("Não foi possível criar evento");
         return;
       }
 
-      showAlerta("Evento criado com sucesso");
+      alerta.success("Evento criado com sucesso");
       navigate(-1);
     } catch (err) {
-      showAlerta("Não foi possível criar evento", "error");
-      console.log("Erro ao criar evento: " + err);
+      alerta.error("Não foi possível criar evento");
+      console.error("Erro ao criar evento: " + err);
     } finally {
       setLoading(false);
     }
@@ -72,9 +76,9 @@ const CriarEvento = ({ setTitulo, setActions }) => {
 
   const [dadosEvento, setDadosEvento] = useState({
     nome: "",
-    orcamento: "",
-    inicio: "",
-    fim: "",
+    orcamento: "0,00",
+    inicio: dayjs().add(2, "day").startOf("day").subtract(12, "hours"),
+    fim: dayjs().add(3, "day").startOf("day").subtract(12, "hours"),
     responsavel: {
       id: "",
       nome: "",
@@ -92,7 +96,28 @@ const CriarEvento = ({ setTitulo, setActions }) => {
     },
   });
 
-  //https://app.serenity.com.br/
+  const [erros, setErros] = useState([]);
+  const [podeAvancar, setAvancar] = useState(false);
+
+  const handleErros = (e) => {
+    setErros((prevState) => ({
+      ...prevState,
+      [e.name]: e.value,
+    }));
+  };
+
+  useEffect(() => {
+    setAvancar(() => {
+      const campos = Object.keys(erros);
+      for (let i = 0; i < campos.length; i++) {
+        if (erros[campos[i]]) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }, [erros]);
 
   const [imagem, setImagem] = useState(null);
 
@@ -133,36 +158,38 @@ const CriarEvento = ({ setTitulo, setActions }) => {
 
   const [formularios, setFormularios] = useState([]);
 
-  const buscarFormularios = async () => {
-    try {
-      const data = await fetchData(`forms`);
-      setFormularios(data);
-    } catch (err) {
-      console.log("Erro ao buscar formulários: " + err);
-      showAlerta("Erro ao buscar formulários", "error");
-    }
-  };
-
   const [responsaveis, setResponsaveis] = useState([]);
 
   useEffect(() => {
+    const buscarFormularios = async () => {
+      try {
+        const data = await fetchData(`forms`);
+        setFormularios(data);
+      } catch (err) {
+        console.error("Erro ao buscar formulários: " + err);
+        alerta.error("Erro ao buscar formulários");
+      }
+    };
+
     const buscarResponsaveis = async () => {
       try {
         const data = await fetchData(`usuarios`);
-        console.log(data);
-        setResponsaveis(
-          data
-            .filter((user) => user.contato !== null)
-            .map((user) => ({ ...user.contato, id: user.id }))
-        );
+
+        const responsaveisData = data
+          .filter((user) => user.contato !== null)
+          .map((user) => ({ ...user.contato, id: user.id }));
+
+        setResponsaveis(responsaveisData);
+
+        dadosEvento.responsavel = responsaveisData[0];
       } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        //console.log("Erro ao buscar responsáveis: " + err);
+        alerta.error("Erro ao buscar responsáveis");
       }
     };
     buscarFormularios();
     buscarResponsaveis();
-  }, []);
+  }, [alerta]);
 
   const handleFormularioChange = (e) => {
     const formulario = formularios.find((f) => f.id === e.target.value);
@@ -194,11 +221,6 @@ const CriarEvento = ({ setTitulo, setActions }) => {
     setDadosEvento({ ...dadosEvento, [name]: e.target.value });
   };
 
-  useEffect(() => {
-    setTitulo("");
-    setActions(null);
-  });
-
   return (
     <>
       <PageModal>
@@ -227,6 +249,8 @@ const CriarEvento = ({ setTitulo, setActions }) => {
                 handleDadosChange={handleDadosChange}
                 dadosEvento={dadosEvento}
                 setDadosEvento={setDadosEvento}
+                handleErros={handleErros}
+                erros={erros}
               />
             )}
 
@@ -236,6 +260,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
                 dadosEvento={dadosEvento}
                 handleEnderecoChange={handleEnderecoChange}
                 handleUfChange={handleUfChange}
+                handleErros={handleErros}
               />
             )}
 
@@ -263,6 +288,7 @@ const CriarEvento = ({ setTitulo, setActions }) => {
           <Botao
             onClick={handleProximo}
             sx={{ width: "100%", minWidth: 100 }}
+            disabled={!!podeAvancar}
             txt={step < qtdSteps - 1 ? "Próximo" : "Criar Evento"}
           />
         </Box>

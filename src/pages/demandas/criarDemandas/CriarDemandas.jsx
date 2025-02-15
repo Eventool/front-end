@@ -6,15 +6,19 @@ import Grid from "@mui/material/Grid2";
 import Esteira from "../../../components/esteira/Esteira";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DadosDemanda from "./DadosDemanda";
-import CadastrarEscalas from "./CadastrarEscalas";
+import CriarEscalas from "./CriarEscalas";
 import TipoContrato from "./TipoContrato";
 import Finalizar from "./Finalizar";
 import { fetchData, postData } from "../../../services/DataService";
 import { useAlerta } from "../../../context/AlertaContext";
+import dayjs from "dayjs";
+import { useLayout } from "../../../layouts/Layout";
 
-const CriarDemandas = ({ setTitulo, setActions }) => {
+const CriarDemandas = () => {
+  const { setTitulo, setActions } = useLayout();
+
   const navigate = useNavigate();
-  const { showAlerta } = useAlerta();
+  const alerta = useAlerta();
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -33,22 +37,25 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
   };
 
   const handleConcluir = async () => {
-    const request = {
+    let request = {
       ...dadosDemanda,
       idEvento: dadosDemanda.evento.id,
       idResponsavel: dadosDemanda.responsavel?.id,
       tipoContrato: dadosDemanda.tipoContrato.id,
+      escalas: dadosDemanda.escalas.map((escala) => {
+        return { ...escala, funcaoEscala: escala.funcao.id };
+      }),
     };
 
     const response = await postData("demandas", request);
 
     if (response.error) {
       console.error(response.data);
-      showAlerta("Não foi possível criar demanda.", "error");
+      alerta.error("Não foi possível criar demanda.");
       return;
     }
 
-    showAlerta(`Demanda ${response.nome} criada com sucesso`);
+    alerta.success(`Demanda ${response.nome} criada com sucesso`);
     navigate(-1);
   };
 
@@ -60,8 +67,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
 
   const [dadosDemanda, setDadosDemanda] = useState({
     nome: "",
-    inicio: "",
-    fim: "",
+    inicio: dayjs().add(2, "day").startOf("day").subtract(12, "hours"),
+    fim: dayjs().add(3, "day").startOf("day").subtract(12, "hours"),
     custoTotal: 0,
     responsavel: {
       id: "",
@@ -108,8 +115,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
         const data = await fetchData(`eventos`);
         setEventos(data);
       } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        //console.log("Erro ao buscar evento: " + err);
+        alerta.error("Erro ao buscar evento");
       }
     };
 
@@ -127,22 +134,49 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
             .map((user) => ({ ...user.contato, id: user.id }))
         );
       } catch (err) {
-        console.log("Erro ao buscar evento: " + err);
-        showAlerta("Erro ao buscar evento", "error");
+        //console.log("Erro ao buscar evento: " + err);
+        alerta.success("Erro ao buscar evento");
       }
     };
 
     buscarResponsaveis();
-  }, [showAlerta]);
+  }, []);
 
   useEffect(() => {
     if (!eventId) return;
 
+    const evento = eventos.find((evento) => evento.id === eventId);
+
+    if (!evento) return;
+
     setDadosDemanda((prevState) => ({
       ...prevState,
-      evento: eventos.find((evento) => evento.id === eventId),
+      evento: evento,
     }));
   }, [eventId, eventos]);
+
+  const [erros, setErros] = useState([]);
+  const [podeAvancar, setAvancar] = useState(true);
+
+  const handleErros = (e) => {
+    setErros((prevState) => ({
+      ...prevState,
+      [e.name]: e.value,
+    }));
+  };
+
+  useEffect(() => {
+    setAvancar(() => {
+      const campos = Object.keys(erros);
+      for (let i = 0; i < campos.length; i++) {
+        if (erros[campos[i]]) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }, [erros]);
 
   return (
     <>
@@ -157,6 +191,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
             </Grid>
             {step === 0 && (
               <DadosDemanda
+                handleErros={handleErros}
+                erros={erros}
                 responsaveis={responsaveis}
                 eventos={eventos}
                 hasParams={eventId != null}
@@ -167,10 +203,12 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
             )}
 
             {step === 1 && (
-              <CadastrarEscalas
+              <CriarEscalas
                 setDadosDemanda={setDadosDemanda}
                 dadosDemanda={dadosDemanda}
                 adicionarEscala={adicionarEscala}
+                handleErros={handleErros}
+                erros={erros}
               />
             )}
 
@@ -178,6 +216,8 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
               <TipoContrato
                 dadosDemanda={dadosDemanda}
                 handleDadosChange={handleDadosChange}
+                handleErros={handleErros}
+                erros={erros}
               />
             )}
 
@@ -208,6 +248,7 @@ const CriarDemandas = ({ setTitulo, setActions }) => {
           <Botao
             onClick={handleProximo}
             sx={{ width: "100%", minWidth: 100 }}
+            disabled={!!podeAvancar}
             txt={step < qtdSteps - 1 ? "Próximo" : "Criar Demanda"}
           />
         </Box>
